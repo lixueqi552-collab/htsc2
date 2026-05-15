@@ -14,9 +14,9 @@
 </head>
 <body>
   <script>
-    (function() { if (!localStorage.getItem('auth_user')) location.href = 'login.html' })()
+    (function() { if (!localStorage.getItem('auth_user')) location.href = 'index.html' })()
     function getAuthUser() { try { return JSON.parse(localStorage.getItem('auth_user')) } catch(e) { return null } }
-    function handleLogout() { localStorage.removeItem('auth_user'); location.href = 'login.html' }
+    function handleLogout() { localStorage.removeItem('auth_user'); location.href = 'index.html' }
     function navTo(path) { location.href = path }
   </script>
 
