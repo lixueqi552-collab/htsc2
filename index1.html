@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能合同审查</title>
+  <script>
+    (function() {
+      var user = localStorage.getItem('auth_user')
+      if (!user) { location.href = 'index.html'; return }
+      location.href = 'dashboard.html'
+    })()
+  </script>
+</head>
+<body>
+  <p style="font-family:sans-serif;padding:40px;text-align:center;color:#999">正在跳转...</p>
+</body>
+</html>
