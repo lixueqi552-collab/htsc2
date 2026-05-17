@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>工作台 — 智能合同审查</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; background: #f5f5f5; color: #262626; font-size: 15px; line-height: 1.6; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <script>
+    (function() { if (!localStorage.getItem('auth_user')) location.href = 'index.html' })()
+    function getAuthUser() { try { return JSON.parse(localStorage.getItem('auth_user')) } catch(e) { return null } }
+    function handleLogout() { localStorage.removeItem('auth_user'); location.href = 'index.html' }
+    function navTo(path) { location.href = path }
+  </script>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 h-[72px] flex items-center justify-between px-8 lg:px-10 sticky top-0 z-50">
+    <div class="flex items-center gap-10">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navTo('dashboard.html')">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-[15px] font-bold shadow-sm">
+          <i class="fa-regular fa-file-lines" style="font-size:18px"></i>
+        </div>
+        <span class="font-semibold text-base text-gray-900">智能合同审查</span>
+      </div>
+      <nav class="flex items-center gap-1">
+        <button onclick="navTo('dashboard.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-[#1677ff] font-semibold bg-blue-50">
+          <i class="fa-solid fa-house"></i> 工作台
+        </button>
+        <button onclick="navTo('review-list.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-file-lines"></i> 合同审查
+        </button>
+        <button onclick="navTo('history.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-clock"></i> 历史记录
+        </button>
+      </nav>
+    </div>
+    <div class="relative group">
+      <div class="flex items-center gap-2.5 text-sm text-gray-500 cursor-pointer select-none">
+        <div id="userAvatar" class="w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center text-white text-xs font-semibold">U</div>
+        <span id="userName" class="text-sm text-gray-600">用户</span>
+        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-100 hidden group-hover:block z-10 overflow-hidden">
+        <button onclick="navTo('profile.html')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50"><i class="fa-regular fa-user" style="color:#1677ff"></i> 个人中心</button>
+        <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> 退出</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-[90rem] mx-auto w-full px-8 lg:px-10 py-6 lg:py-8">
+    <div>
+      <div class="mb-8">
+        <h1 class="text-2xl font-bold text-gray-900">欢迎回来</h1>
+        <p class="text-base text-gray-500 mt-1">今天有 3 份合同待审查，点击下方开始</p>
+      </div>
+
+      <!-- Hero Banner -->
+      <div class="bg-gradient-to-br from-[#1677ff] to-[#4096ff] rounded-xl p-8 mb-8 text-white">
+        <div class="flex items-center justify-between">
+          <div class="max-w-lg">
+            <h2 class="text-2xl font-bold mb-2">AI 智能合同审查</h2>
+            <p class="text-base text-white/80 mb-6 leading-relaxed">上传合同文件，AI 自动识别类型并全面审查风险点，3-5 分钟获取专业审查报告</p>
+            <button onclick="navTo('review.html')" class="inline-flex items-center gap-2 bg-white text-[#1677ff] font-semibold px-6 py-3 rounded-lg hover:bg-gray-50 transition-colors shadow-sm">
+              <i class="fa-solid fa-file-magnifying-glass"></i> 立即审查合同
+            </button>
+          </div>
+          <div class="hidden md:flex w-28 h-28 rounded-full bg-white/15 items-center justify-center">
+            <i class="fa-solid fa-file-magnifying-glass text-4xl text-white/90"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div class="lg:col-span-2 space-y-6">
+          <!-- Tools -->
+          <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <i class="fa-solid fa-bolt text-sm text-[#1677ff]"></i>
+              <h3 class="font-semibold text-base text-gray-800">辅助工具</h3>
+            </div>
+            <div class="grid grid-cols-3 gap-4">
+              <div onclick="navTo('tools.html?type=pdf2word')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-file-pdf text-2xl" style="color:#ff4d4f"></i>
+                <span class="text-sm font-medium text-gray-700">PDF 转 Word</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">精准转换，保留排版</span>
+              </div>
+              <div onclick="navTo('tools.html?type=ocr')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-image text-2xl" style="color:#722ed1"></i>
+                <span class="text-sm font-medium text-gray-700">图片转文字</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">OCR 识别，提取文本</span>
+              </div>
+              <div onclick="navTo('tools.html?type=tablextract')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-table text-2xl" style="color:#52c41a"></i>
+                <span class="text-sm font-medium text-gray-700">表格提取</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">从文档中提取表格数据</span>
+              </div>
+              <div onclick="navTo('tools.html?type=doccompare')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-right-left text-2xl" style="color:#1677ff"></i>
+                <span class="text-sm font-medium text-gray-700">文档对比</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">比对两份文档的差异</span>
+              </div>
+              <div onclick="navTo('tools.html?type=formatconv')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-qrcode text-2xl" style="color:#faad14"></i>
+                <span class="text-sm font-medium text-gray-700">格式转换</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">支持 10+ 格式互转</span>
+              </div>
+              <div onclick="navTo('tools.html?type=grammar')" class="flex flex-col items-center gap-2 p-5 rounded-lg border border-gray-100 hover:border-gray-200 hover:shadow-sm cursor-pointer transition-all">
+                <i class="fa-solid fa-shield-halved text-2xl" style="color:#13c2c2"></i>
+                <span class="text-sm font-medium text-gray-700">智能纠错</span>
+                <span class="text-xs text-gray-400 text-center leading-tight">检查字词和语法错误</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Recent Activities -->
+          <div class="bg-white rounded-xl border border-gray-100 p-6">
+            <div class="flex items-center gap-2 mb-4">
+              <i class="fa-regular fa-clock text-sm text-[#1677ff]"></i>
+              <h3 class="font-semibold text-base text-gray-800">最近动态</h3>
+            </div>
+            <div class="space-y-1">
+              <div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors" onclick="navTo('review.html?report=1')">
+                <div class="flex items-center gap-3">
+                  <div class="w-2.5 h-2.5 rounded-full bg-green-500"></div>
+                  <div>
+                    <span class="text-base text-gray-800">设备采购框架协议</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">审查完成</span>
+                      <span class="text-xs text-gray-400">10 分钟前</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-green-50 text-green-600">88分</span>
+              </div>
+              <div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-2.5 h-2.5 rounded-full bg-blue-500"></div>
+                  <div>
+                    <span class="text-base text-gray-800">IT 运维服务合同</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600">审查中</span>
+                      <span class="text-xs text-gray-400">30 分钟前</span>
+                    </div>
+                  </div>
+                </div>
+                <div class="flex gap-1">
+                  <div class="w-4 h-1.5 rounded-sm bg-blue-500"></div>
+                  <div class="w-4 h-1.5 rounded-sm bg-blue-500"></div>
+                  <div class="w-4 h-1.5 rounded-sm bg-gray-200"></div>
+                  <div class="w-4 h-1.5 rounded-sm bg-gray-200"></div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors">
+                <div class="flex items-center gap-3">
+                  <div class="w-2.5 h-2.5 rounded-full bg-yellow-500"></div>
+                  <div>
+                    <span class="text-base text-gray-800">保密协议-v3.pdf</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-600">待审查</span>
+                      <span class="text-xs text-gray-400">1 小时前</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex items-center justify-between py-3 px-4 rounded-lg hover:bg-gray-50 cursor-pointer transition-colors" onclick="navTo('review.html?report=1')">
+                <div class="flex items-center gap-3">
+                  <div class="w-2.5 h-2.5 rounded-full bg-red-500"></div>
+                  <div>
+                    <span class="text-base text-gray-800">办公楼租赁协议</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-600">有风险</span>
+                      <span class="text-xs text-gray-400">2 小时前</span>
+                    </div>
+                  </div>
+                </div>
+                <span class="text-xs font-semibold px-2 py-0.5 rounded bg-red-50 text-red-600">65分</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Sidebar -->
+        <div class="space-y-4">
+          <div class="bg-white rounded-xl border border-gray-100 p-5">
+            <div class="flex items-center gap-2 mb-3">
+              <i class="fa-solid fa-shield-halved text-sm text-[#1677ff]"></i>
+              <h3 class="font-semibold text-sm text-gray-800">快速入口</h3>
+            </div>
+            <div class="space-y-2">
+              <button onclick="navTo('review.html')" class="w-full bg-[#1677ff] text-white py-3 rounded-lg font-semibold text-sm hover:bg-[#0958d9] transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-file-magnifying-glass"></i> 合同审查
+              </button>
+              <button onclick="navTo('tools.html?type=formatconv')" class="w-full border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-right-left"></i> 文档格式转换
+              </button>
+              <button onclick="navTo('tools.html?type=pdf2word')" class="w-full border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center justify-center gap-2">
+                <i class="fa-regular fa-file-lines"></i> PDF 转 Word
+              </button>
+              <button onclick="navTo('tools.html?type=ocr')" class="w-full border border-gray-200 text-gray-600 py-2.5 rounded-lg text-sm hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center justify-center gap-2">
+                <i class="fa-solid fa-qrcode"></i> 图片文字识别
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-4">
+            <div class="flex gap-3">
+              <span class="text-lg shrink-0">💡</span>
+              <div>
+                <p class="text-xs font-semibold text-blue-800 mb-0.5">使用提示</p>
+                <p class="text-[11px] text-blue-600 leading-relaxed">支持 PDF/DOC/DOCX 格式，单个文件最大 50MB，建议上传 PDF 以获得最佳审查效果</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 border-t border-gray-100 bg-white">
+    <span class="text-xs text-gray-400">智能合同审查系统 &copy; 2026</span>
+  </footer>
+
+  <script>
+    var u = getAuthUser()
+    if (u) { document.getElementById('userName').textContent = u.name; document.getElementById('userAvatar').textContent = u.name[0] }
+  </script>
+</body>
+</html>

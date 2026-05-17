@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>个人中心 — 智能合同审查</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; background: #f5f5f5; color: #262626; font-size: 15px; line-height: 1.6; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <script>
+    (function() { if (!localStorage.getItem('auth_user')) location.href = 'index.html' })()
+    function getAuthUser() { try { return JSON.parse(localStorage.getItem('auth_user')) } catch(e) { return null } }
+    function handleLogout() { localStorage.removeItem('auth_user'); location.href = 'index.html' }
+    function navTo(path) { location.href = path }
+  </script>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 h-[72px] flex items-center justify-between px-8 lg:px-10 sticky top-0 z-50">
+    <div class="flex items-center gap-10">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navTo('dashboard.html')">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-[15px] font-bold shadow-sm">
+          <i class="fa-regular fa-file-lines" style="font-size:18px"></i>
+        </div>
+        <span class="font-semibold text-base text-gray-900">智能合同审查</span>
+      </div>
+      <nav class="flex items-center gap-1">
+        <button onclick="navTo('dashboard.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-solid fa-house"></i> 工作台
+        </button>
+        <button onclick="navTo('review-list.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-file-lines"></i> 合同审查
+        </button>
+        <button onclick="navTo('history.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-clock"></i> 历史记录
+        </button>
+      </nav>
+    </div>
+    <div class="relative group">
+      <div class="flex items-center gap-2.5 text-sm text-gray-500 cursor-pointer select-none">
+        <div id="userAvatar" class="w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center text-white text-xs font-semibold">U</div>
+        <span id="userName" class="text-sm text-gray-600">用户</span>
+        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-100 hidden group-hover:block z-10 overflow-hidden">
+        <button onclick="navTo('profile.html')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50"><i class="fa-regular fa-user" style="color:#1677ff"></i> 个人中心</button>
+        <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> 退出</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-[90rem] mx-auto w-full px-8 lg:px-10 py-6 lg:py-8">
+    <div class="max-w-2xl mx-auto">
+      <div class="flex items-center gap-3 mb-6">
+        <div class="w-14 h-14 rounded-full bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-xl font-bold shadow-sm" id="pageAvatar">U</div>
+        <div>
+          <h1 class="text-xl font-bold text-gray-900" id="pageName">用户</h1>
+          <p class="text-sm text-gray-500">个人中心</p>
+        </div>
+      </div>
+
+      <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
+        <div class="px-6 py-4 border-b border-gray-100 bg-gray-50">
+          <span class="text-sm font-semibold text-gray-700 flex items-center gap-2"><i class="fa-solid fa-lock" style="color:#1677ff"></i> 修改密码</span>
+        </div>
+        <div class="p-6 space-y-5">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">当前密码</label>
+            <input type="password" id="oldPwd" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" placeholder="请输入当前密码">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">新密码</label>
+            <input type="password" id="newPwd" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" placeholder="请输入新密码（至少 6 位）">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1.5">确认新密码</label>
+            <input type="password" id="confirmPwd" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" placeholder="请再次输入新密码">
+          </div>
+          <div class="flex items-center gap-3 pt-2">
+            <button onclick="changePassword()" class="bg-[#1677ff] text-white px-6 py-2.5 rounded-lg font-semibold text-sm hover:bg-[#0958d9] transition-colors flex items-center gap-2"><i class="fa-solid fa-check"></i> 确认修改</button>
+            <button onclick="navTo('dashboard.html')" class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm font-medium hover:border-gray-300 transition-colors">取消</button>
+          </div>
+          <div id="pwdMsg" class="text-sm" style="display:none"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 border-t border-gray-100 bg-white">
+    <span class="text-xs text-gray-400">智能合同审查系统 &copy; 2026</span>
+  </footer>
+
+  <script>
+    var u = getAuthUser()
+    if (u) { document.getElementById('userName').textContent = u.name; document.getElementById('userAvatar').textContent = u.name[0]; document.getElementById('pageName').textContent = u.name; document.getElementById('pageAvatar').textContent = u.name[0] }
+
+    function changePassword() {
+      var oldPwd = document.getElementById('oldPwd').value
+      var newPwd = document.getElementById('newPwd').value
+      var confirmPwd = document.getElementById('confirmPwd').value
+      var msg = document.getElementById('pwdMsg')
+      msg.style.display = ''
+
+      var stored = JSON.parse(localStorage.getItem('auth_user') || '{}')
+      var defaultPwd = '123456'
+
+      if (!oldPwd || !newPwd || !confirmPwd) {
+        msg.className = 'text-sm text-red-500'; msg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> 请填写所有密码字段'; return
+      }
+      if (oldPwd !== (stored.password || defaultPwd)) {
+        msg.className = 'text-sm text-red-500'; msg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> 当前密码错误'; return
+      }
+      if (newPwd.length < 6) {
+        msg.className = 'text-sm text-red-500'; msg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> 新密码至少 6 位'; return
+      }
+      if (newPwd !== confirmPwd) {
+        msg.className = 'text-sm text-red-500'; msg.innerHTML = '<i class="fa-solid fa-circle-exclamation mr-1"></i> 两次密码输入不一致'; return
+      }
+
+      stored.password = newPwd
+      localStorage.setItem('auth_user', JSON.stringify(stored))
+      msg.className = 'text-sm text-green-600'; msg.innerHTML = '<i class="fa-solid fa-circle-check mr-1"></i> 密码修改成功！'
+      document.getElementById('oldPwd').value = ''
+      document.getElementById('newPwd').value = ''
+      document.getElementById('confirmPwd').value = ''
+    }
+  </script>
+</body>
+</html>

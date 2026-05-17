@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>辅助工具 — 智能合同审查</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Microsoft YaHei', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; background: #f5f5f5; color: #262626; font-size: 15px; line-height: 1.6; }
+    a { text-decoration: none; }
+  </style>
+</head>
+<body>
+  <script>
+    (function() { if (!localStorage.getItem('auth_user')) location.href = 'index.html' })()
+    function getAuthUser() { try { return JSON.parse(localStorage.getItem('auth_user')) } catch(e) { return null } }
+    function handleLogout() { localStorage.removeItem('auth_user'); location.href = 'index.html' }
+    function navTo(path) { location.href = path }
+  </script>
+
+  <!-- Header -->
+  <header class="bg-white border-b border-gray-200 h-[72px] flex items-center justify-between px-8 lg:px-10 sticky top-0 z-50">
+    <div class="flex items-center gap-10">
+      <div class="flex items-center gap-3 cursor-pointer" onclick="navTo('dashboard.html')">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-[15px] font-bold shadow-sm">
+          <i class="fa-regular fa-file-lines" style="font-size:18px"></i>
+        </div>
+        <span class="font-semibold text-base text-gray-900">智能合同审查</span>
+      </div>
+      <nav class="flex items-center gap-1">
+        <button onclick="navTo('dashboard.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-solid fa-house"></i> 工作台
+        </button>
+        <button onclick="navTo('review-list.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-file-lines"></i> 合同审查
+        </button>
+        <button onclick="navTo('history.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
+          <i class="fa-regular fa-clock"></i> 历史记录
+        </button>
+      </nav>
+    </div>
+    <div class="relative group">
+      <div class="flex items-center gap-2.5 text-sm text-gray-500 cursor-pointer select-none">
+        <div id="userAvatar" class="w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center text-white text-xs font-semibold">U</div>
+        <span id="userName" class="text-sm text-gray-600">用户</span>
+        <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+      </div>
+      <div class="absolute right-0 top-full mt-1 w-40 bg-white rounded-lg shadow-lg border border-gray-100 hidden group-hover:block z-10 overflow-hidden">
+        <button onclick="navTo('profile.html')" class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50"><i class="fa-regular fa-user" style="color:#1677ff"></i> 个人中心</button>
+        <button onclick="handleLogout()" class="w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"><i class="fa-solid fa-right-from-bracket"></i> 退出</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main -->
+  <main class="flex-1 max-w-[90rem] mx-auto w-full px-8 lg:px-10 py-6 lg:py-8">
+    <div>
+      <!-- Breadcrumb -->
+      <div class="flex items-center gap-2 text-sm text-gray-400 mb-4">
+        <a href="dashboard.html" class="hover:text-[#1677ff]">工作台</a>
+        <i class="fa-solid fa-chevron-right text-[10px]"></i>
+        <span class="text-gray-700 font-medium" id="toolBreadcrumb">辅助工具</span>
+      </div>
+
+      <!-- Tool Header -->
+      <div class="flex items-center gap-4 mb-6">
+        <div id="toolIcon" class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"></div>
+        <div>
+          <h1 id="toolTitle" class="text-xl font-bold text-gray-900">辅助工具</h1>
+          <p id="toolDesc" class="text-sm text-gray-500 mt-0.5">工具描述</p>
+        </div>
+      </div>
+
+      <!-- Step indicators (for convert tools) -->
+      <div id="stepBar" class="flex items-center gap-0 mb-6 bg-white rounded-lg p-1 border border-gray-100" style="display:none">
+        <div class="step-dot flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md" data-step="0" style="background:#1677ff;color:#fff">
+          <div class="w-1.5 h-1.5 rounded-full bg-current"></div> 上传文件
+        </div>
+        <div class="step-dot flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="1">
+          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 格式转换
+        </div>
+        <div class="step-dot flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="2">
+          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 预览结果
+        </div>
+      </div>
+
+      <!-- ========== STEP 0: Upload ========== -->
+      <div id="step-0" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8" style="display:none">
+        <div id="uploadArea" class="text-center">
+          <div id="dropZone" class="border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors" style="border-color:#d9d9d9">
+            <i id="uploadIcon" class="fa-solid fa-cloud-arrow-up text-4xl mb-3" style="color:#d9d9d9"></i>
+            <p id="uploadHint" class="text-sm font-medium text-gray-700 mb-1">拖拽文件到此处，或点击浏览</p>
+            <p id="uploadSubHint" class="text-xs text-gray-400">支持 PDF、DOC、DOCX 格式</p>
+            <input type="file" id="fileInput" style="display:none">
+            <button id="selectFileBtn" class="inline-block mt-4 border border-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors text-sm cursor-pointer">选择文件</button>
+          </div>
+          <div id="fileList" class="mt-4 space-y-1.5" style="display:none"></div>
+          <div id="dualUpload" class="mt-4 space-y-3" style="display:none">
+            <div class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors" id="dropZone2" style="border-color:#d9d9d9">
+              <i class="fa-solid fa-cloud-arrow-up text-3xl mb-2" style="color:#d9d9d9"></i>
+              <p class="text-sm text-gray-500">上传对比文档（旧版/原版）</p>
+              <p class="text-xs text-gray-400">支持 PDF、DOC、DOCX</p>
+              <input type="file" id="fileInput2" style="display:none">
+              <button class="inline-block mt-3 border border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors text-xs cursor-pointer">选择文件</button>
+            </div>
+            <div id="fileList2" class="space-y-1" style="display:none"></div>
+          </div>
+          <div id="textInputArea" class="mt-6" style="display:none">
+            <textarea id="textInput" class="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20 min-h-[160px]" rows="6" placeholder="请输入需要检查的文本内容..."></textarea>
+          </div>
+          <div class="flex items-center justify-center mt-6 pt-4 border-t border-gray-100">
+            <button id="convertBtn" class="bg-[#1677ff] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-sm">
+              <i id="convertBtnIcon" class="fa-solid fa-wand-magic-sparkles"></i> <span id="convertBtnText">开始转换</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== STEP 1: Converting ========== -->
+      <div id="step-1" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8" style="display:none">
+        <div class="text-center py-12">
+          <div id="convertStatus" class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
+            <i class="fa-solid fa-spinner text-2xl text-[#1677ff] fa-spin"></i>
+          </div>
+          <h3 id="convertTitle" class="text-base font-semibold text-gray-800 mb-1">正在转换...</h3>
+          <p id="convertDesc" class="text-sm text-gray-500 mb-6">请稍候，正在处理您的文件</p>
+          <div class="max-w-xs mx-auto">
+            <div class="h-2 rounded-full bg-gray-200 overflow-hidden">
+              <div id="convertProgress" class="h-full rounded-full bg-[#1677ff] transition-all" style="width:0%"></div>
+            </div>
+            <p id="convertPercent" class="text-xs text-gray-400 mt-2">0%</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- ========== STEP 2: Preview ========== -->
+      <div id="step-2" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8" style="display:none">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-sm font-semibold text-gray-800 flex items-center gap-2">
+            <i class="fa-regular fa-eye" style="color:#1677ff"></i> 转换结果预览
+          </h3>
+          <div class="flex items-center gap-2">
+            <button id="copyBtn" class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-xs hover:border-gray-300 transition-colors flex items-center gap-1"><i class="fa-regular fa-copy"></i> 复制</button>
+            <button id="downloadBtn" class="border border-gray-200 text-gray-600 px-3 py-1.5 rounded-lg text-xs hover:border-gray-300 transition-colors flex items-center gap-1"><i class="fa-solid fa-download"></i> 下载</button>
+          </div>
+        </div>
+        <div id="previewArea" class="bg-gray-50 rounded-lg p-4 min-h-[200px] max-h-[400px] overflow-y-auto text-sm text-gray-700 leading-relaxed whitespace-pre-wrap"></div>
+        <div id="diffPreview" class="space-y-3" style="display:none">
+          <div class="bg-gray-50 rounded-lg p-4 max-h-[300px] overflow-y-auto text-sm leading-relaxed" id="diffOld"></div>
+          <div class="bg-green-50 rounded-lg p-4 max-h-[300px] overflow-y-auto text-sm leading-relaxed" id="diffNew"></div>
+        </div>
+        <div id="errorPreview" class="space-y-3" style="display:none">
+          <div id="errorStats" class="flex items-center gap-4 flex-wrap"></div>
+          <div id="errorList" class="space-y-2"></div>
+        </div>
+        <div id="tablePreview" class="overflow-x-auto" style="display:none">
+          <table class="w-full text-sm border-collapse">
+            <thead><tr class="bg-gray-50" id="tableHead"></tr></thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+        </div>
+        <div class="flex items-center justify-center gap-3 mt-6 pt-4 border-t border-gray-100">
+          <button onclick="goStep(0)" class="border border-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center gap-1"><i class="fa-solid fa-arrow-left"></i> 重新选择</button>
+          <button id="reviewBtn" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2 shadow-sm" style="display:none">
+            <i class="fa-solid fa-file-magnifying-glass"></i> 开始审查
+          </button>
+          <button id="recheckBtn" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2 shadow-sm" style="display:none">
+            <i class="fa-solid fa-rotate"></i> 重新检查
+          </button>
+          <button id="finalDownloadBtn" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2 shadow-sm" style="display:none">
+            <i class="fa-solid fa-download"></i> 下载结果
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="text-center py-4 border-t border-gray-100 bg-white">
+    <span class="text-xs text-gray-400">智能合同审查系统 &copy; 2026</span>
+  </footer>
+
+  <script>
+    var u = getAuthUser()
+    if (u) { document.getElementById('userName').textContent = u.name; document.getElementById('userAvatar').textContent = u.name[0] }
+
+    var TOOL_CONFIG = {
+      pdf2word: { name: 'PDF 转 Word', icon: 'fa-file-pdf', color: '#ff4d4f', desc: '精准转换 PDF 为可编辑的 Word 文档，保留原始排版', hint: '支持 PDF 格式，单个文件 ≤ 50MB', accept: '.pdf', hasReview: true, convText: '正在转换 PDF 文档...' },
+      ocr: { name: '图片转文字', icon: 'fa-image', color: '#722ed1', desc: 'OCR 图片文字识别，快速提取图片中的文字内容', hint: '支持 JPG、PNG、BMP 格式，单个文件 ≤ 20MB', accept: '.jpg,.jpeg,.png,.bmp', hasReview: true, convText: '正在识别图片文字...' },
+      tablextract: { name: '表格提取', icon: 'fa-table', color: '#52c41a', desc: '从文档中智能识别并提取表格数据', hint: '支持 PDF、DOC、DOCX、图片格式', accept: '.pdf,.doc,.docx,.jpg,.jpeg,.png', hasReview: true, convText: '正在提取表格数据...' },
+      doccompare: { name: '文档对比', icon: 'fa-right-left', color: '#1677ff', desc: '比对两份文档的差异，高亮显示新增、删除和修改内容', hint: '支持 PDF、DOC、DOCX 格式', accept: '.pdf,.doc,.docx', hasReview: false, convText: '正在比对文档差异...' },
+      formatconv: { name: '格式转换', icon: 'fa-qrcode', color: '#faad14', desc: '支持 10+ 文档格式互转，满足多样化需求', hint: '支持 PDF、DOC、DOCX、TXT、HTML 等格式', accept: '.pdf,.doc,.docx,.txt,.html', hasReview: false, convText: '正在转换格式...' },
+      grammar: { name: '智能纠错', icon: 'fa-shield-halved', color: '#13c2c2', desc: 'AI 自动检查字词、标点、语法错误，并提供修改建议', hint: '输入或粘贴文本内容进行检查', accept: '', hasReview: false, convText: '正在检查文本...' }
+    }
+
+    var type = new URLSearchParams(window.location.search).get('type') || 'pdf2word'
+    if (!TOOL_CONFIG[type]) type = 'pdf2word'
+    var cfg = TOOL_CONFIG[type]
+
+    document.getElementById('toolIcon').innerHTML = '<i class="fa-solid ' + cfg.icon + '" style="color:' + cfg.color + '"></i>'
+    document.getElementById('toolIcon').style.background = cfg.color + '18'
+    document.getElementById('toolTitle').textContent = cfg.name
+    document.getElementById('toolDesc').textContent = cfg.desc
+    document.getElementById('toolBreadcrumb').textContent = cfg.name
+    document.title = cfg.name + ' — 智能合同审查'
+
+    var isDualUpload = type === 'doccompare'
+    var isTextInput = type === 'grammar'
+    var needsStepBar = type !== 'grammar' && type !== 'doccompare'
+
+    if (needsStepBar) document.getElementById('stepBar').style.display = ''
+
+    // Upload area config
+    document.getElementById('uploadHint').textContent = isTextInput ? '输入需要检查的文本' : '拖拽文件到此处，或点击浏览'
+    document.getElementById('uploadSubHint').textContent = cfg.hint
+    if (isDualUpload) {
+      document.getElementById('dualUpload').style.display = ''
+    }
+    if (isTextInput) {
+      document.getElementById('textInputArea').style.display = ''
+      document.getElementById('dropZone').style.display = 'none'
+      document.getElementById('uploadIcon').className = 'fa-solid fa-pen text-4xl mb-3'
+      document.getElementById('uploadIcon').style.color = cfg.color
+      document.getElementById('convertBtnText').textContent = '开始检查'
+      document.getElementById('convertBtnIcon').className = 'fa-solid fa-magnifying-glass'
+    } else if (isDualUpload) {
+      document.getElementById('convertBtnText').textContent = '开始比对'
+      document.getElementById('convertBtnIcon').className = 'fa-solid fa-right-left'
+    }
+
+    // File input accept
+    if (cfg.accept) document.getElementById('fileInput').accept = cfg.accept
+
+    // Step-based flow
+    var steps = ['step-0', 'step-1', 'step-2']
+    var stepDots = document.querySelectorAll('.step-dot')
+
+    function goStep(n) {
+      steps.forEach(function(id, i) {
+        document.getElementById(id).style.display = i === n ? '' : 'none'
+        if (stepDots.length) {
+          var el = stepDots[i]
+          if (i < n) { el.style.background = ''; el.style.color = '#16a34a'; el.innerHTML = '<i class="fa-solid fa-check text-xs"></i> ' + ['上传文件','格式转换','预览结果'][i] }
+          else if (i === n) { el.style.background = '#1677ff'; el.style.color = '#fff'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-current"></div> ' + ['上传文件','格式转换','预览结果'][i] }
+          else { el.style.background = ''; el.style.color = '#9ca3af'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> ' + ['上传文件','格式转换','预览结果'][i] }
+        }
+      })
+    }
+
+    goStep(0)
+
+    // ========== File handling ==========
+    var currentFile = null
+    var currentFile2 = null
+    var convertedText = ''
+
+    var dropZone = document.getElementById('dropZone')
+    var fileInput = document.getElementById('fileInput')
+    var fileList = document.getElementById('fileList')
+    var convertBtn = document.getElementById('convertBtn')
+
+    dropZone.onclick = function() { fileInput.click() }
+    dropZone.ondragover = function(e) { e.preventDefault(); dropZone.style.borderColor = '#1677ff'; dropZone.style.background = '#f0f5ff' }
+    dropZone.ondragleave = function() { dropZone.style.borderColor = '#d9d9d9'; dropZone.style.background = '' }
+    dropZone.ondrop = function(e) { e.preventDefault(); dropZone.style.borderColor = '#d9d9d9'; dropZone.style.background = ''; handleFiles(e.dataTransfer.files) }
+    document.getElementById('selectFileBtn').onclick = function(e) { e.stopPropagation(); fileInput.click() }
+    fileInput.onchange = function() { if (fileInput.files.length) handleFiles(fileInput.files) }
+
+    // Dual upload (doccompare)
+    if (isDualUpload) {
+      var dropZone2 = document.getElementById('dropZone2')
+      var fileInput2 = document.getElementById('fileInput2')
+      var fileList2 = document.getElementById('fileList2')
+      dropZone2.onclick = function() { fileInput2.click() }
+      dropZone2.ondragover = function(e) { e.preventDefault(); dropZone2.style.borderColor = '#1677ff'; dropZone2.style.background = '#f0f5ff' }
+      dropZone2.ondragleave = function() { dropZone2.style.borderColor = '#d9d9d9'; dropZone2.style.background = '' }
+      dropZone2.ondrop = function(e) { e.preventDefault(); dropZone2.style.borderColor = '#d9d9d9'; dropZone2.style.background = ''; handleFiles2(e.dataTransfer.files) }
+      dropZone2.querySelector('button').onclick = function(e) { e.stopPropagation(); fileInput2.click() }
+      fileInput2.onchange = function() { if (fileInput2.files.length) handleFiles2(fileInput2.files) }
+    }
+
+    function handleFiles(files) {
+      currentFile = files[0]
+      fileList.style.display = 'block'
+      fileList.innerHTML = ''
+      Array.from(files).slice(0, 3).forEach(function(f, i) {
+        var size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+' MB' : (f.size/1024).toFixed(0)+' KB'
+        fileList.innerHTML += '<div class="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50"><div class="flex items-center gap-2"><i class="fa-regular fa-file-lines" style="color:' + cfg.color + '"></i><span class="text-sm text-gray-700">' + f.name + '</span><span class="text-[10px] text-gray-400">' + size + '</span></div><button onclick="removeFile()" class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash-can"></i></button></div>'
+      })
+      convertBtn.disabled = false
+    }
+
+    function handleFiles2(files) {
+      currentFile2 = files[0]
+      fileList2.style.display = 'block'
+      var f = files[0]
+      var size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+' MB' : (f.size/1024).toFixed(0)+' KB'
+      fileList2.innerHTML = '<div class="flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50"><div class="flex items-center gap-2"><i class="fa-regular fa-file-lines" style="color:' + cfg.color + '"></i><span class="text-sm text-gray-700">' + f.name + '</span><span class="text-[10px] text-gray-400">' + size + '</span></div><button onclick="removeFile2()" class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash-can"></i></button></div>'
+      convertBtn.disabled = false
+    }
+
+    function removeFile() { currentFile = null; fileList.style.display = 'none'; fileList.innerHTML = ''; convertBtn.disabled = true }
+    function removeFile2() { currentFile2 = null; fileList2.style.display = 'none'; fileList2.innerHTML = '' }
+
+    // ========== Convert ==========
+    convertBtn.onclick = function() {
+      if (isTextInput) {
+        var txt = document.getElementById('textInput').value.trim()
+        if (!txt) return
+        convertedText = txt
+        doConvert()
+      } else if (isDualUpload) {
+        if (!currentFile || !currentFile2) return
+        doConvert()
+      } else {
+        if (!currentFile) return
+        doConvert()
+      }
+    }
+
+    function doConvert() {
+      goStep(1)
+      document.getElementById('convertTitle').textContent = cfg.convText
+      var p = 0
+      var timer = setInterval(function() {
+        p += type === 'grammar' ? 20 : type === 'doccompare' ? 12 : 8
+        if (p > 100) p = 100
+        document.getElementById('convertProgress').style.width = p + '%'
+        document.getElementById('convertPercent').textContent = p + '%'
+        if (p >= 100) {
+          clearInterval(timer)
+          setTimeout(showResult, 300)
+        }
+      }, 200)
+    }
+
+    function showResult() {
+      goStep(2)
+
+      var previewArea = document.getElementById('previewArea')
+      var diffPreview = document.getElementById('diffPreview')
+      var errorPreview = document.getElementById('errorPreview')
+      var tablePreview = document.getElementById('tablePreview')
+      var reviewBtn = document.getElementById('reviewBtn')
+      var recheckBtn = document.getElementById('recheckBtn')
+      var finalDownloadBtn = document.getElementById('finalDownloadBtn')
+      var copyBtn = document.getElementById('copyBtn')
+      var downloadBtn = document.getElementById('downloadBtn')
+
+      previewArea.style.display = 'none'
+      diffPreview.style.display = 'none'
+      errorPreview.style.display = 'none'
+      tablePreview.style.display = 'none'
+      reviewBtn.style.display = 'none'
+      recheckBtn.style.display = 'none'
+      finalDownloadBtn.style.display = 'none'
+      copyBtn.style.display = 'none'
+      downloadBtn.style.display = 'none'
+
+      if (type === 'pdf2word' || type === 'ocr') {
+        convertedText = mockConvertedText(type)
+        previewArea.textContent = convertedText
+        previewArea.style.display = ''
+        copyBtn.style.display = ''
+        downloadBtn.style.display = ''
+        reviewBtn.style.display = ''
+      }
+      else if (type === 'tablextract') {
+        convertedText = mockTableData()
+        tablePreview.style.display = ''
+        reviewBtn.style.display = ''
+        renderTable(convertedText)
+      }
+      else if (type === 'doccompare') {
+        diffPreview.style.display = ''
+        document.getElementById('diffOld').innerHTML = '<p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-red-400"></span> 原文档</p><div class="text-gray-700">' + mockDiffOld() + '</div>'
+        document.getElementById('diffNew').innerHTML = '<p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-green-400"></span> 新文档 <span class="text-green-500 font-normal">(修改/新增)</span></p><div class="text-gray-700">' + mockDiffNew() + '</div>'
+        copyBtn.style.display = ''
+        downloadBtn.style.display = ''
+      }
+      else if (type === 'formatconv') {
+        convertedText = mockConvertedText('pdf2word')
+        previewArea.textContent = convertedText
+        previewArea.style.display = ''
+        copyBtn.style.display = ''
+        finalDownloadBtn.style.display = ''
+      }
+      else if (type === 'grammar') {
+        errorPreview.style.display = ''
+        recheckBtn.style.display = ''
+        showGrammarErrors()
+      }
+    }
+
+    // ========== Mock data ==========
+    function mockConvertedText(t) {
+      return t === 'ocr'
+        ? '设备采购框架协议\n\n合同编号：CT-2026-001\n签署日期：2026-05-01\n\n第一条 合同主体\n甲方（采购方）：XX科技有限公司\n乙方（供应方）：YY设备制造有限公司\n\n第二条 采购内容\n2.1 采购设备清单详见附件一。\n2.2 设备技术参数及验收标准详见附件二。\n\n第三条 合同价款及支付\n3.1 合同总价为人民币伍佰万元整（¥5,000,000.00）。\n3.2 上述价格为含税价格，税率为13%。'
+        : '设备采购框架协议\n\n合同编号：CT-2026-001\n签署日期：2026-05-01\n\n第一条 合同主体\n甲方（采购方）：XX科技有限公司\n乙方（供应方）：YY设备制造有限公司\n\n第二条 采购内容\n2.1 采购设备清单详见附件一。\n2.2 设备技术参数及验收标准详见附件二。\n\n第三条 合同价款及支付\n3.1 合同总价为人民币伍佰万元整（¥5,000,000.00）。\n3.2 上述价格为含税价格，税率为13%。\n\n（以下内容略，共13条 约3页）'
+    }
+
+    function mockTableData() {
+      return [
+        ['序号', '设备名称', '规格型号', '数量', '单价（元）', '总价（元）', '备注'],
+        ['1', '服务器', 'H3C R4900 G3', '2', '85000', '170000', ''],
+        ['2', '交换机', 'H3C S6850', '5', '32000', '160000', '核心交换'],
+        ['3', '防火墙', '深信服 AF-2000', '2', '65000', '130000', '含3年服务'],
+        ['4', 'UPS电源', '山特 3C20KS', '1', '45000', '45000', ''],
+        ['5', '机柜', '42U标准机柜', '3', '3500', '10500', ''],
+      ]
+    }
+
+    function renderTable(data) {
+      var head = document.getElementById('tableHead')
+      var body = document.getElementById('tableBody')
+      head.innerHTML = data[0].map(function(h) { return '<th class="py-2.5 px-3 text-xs font-medium text-gray-500 border-b border-gray-200 text-left">' + h + '</th>' }).join('')
+      body.innerHTML = data.slice(1).map(function(r) {
+        return '<tr class="hover:bg-gray-50">' + r.map(function(c) { return '<td class="py-2 px-3 text-sm text-gray-700 border-b border-gray-100">' + (c || '-') + '</td>' }).join('') + '</tr>'
+      }).join('')
+    }
+
+    function mockDiffOld() {
+      return '...3.2 上述价格为含税价格，税率为 <span class="bg-red-100 text-red-600 px-0.5 rounded line-through">16%</span>。<br>...<br>...第五条 质量保证<br>5.1 乙方对所供设备提供 <span class="bg-red-100 text-red-600 px-0.5 rounded line-through">24</span> 个月的质量保证期。<br>...<br>...7.3 甲方违约的，违约金上限为合同总价的5%；乙方违约的，违约金上限为合同总价的15%。'
+    }
+
+    function mockDiffNew() {
+      return '...3.2 上述价格为含税价格，税率为 <span class="bg-green-100 text-green-600 px-0.5 rounded font-medium">13%</span>。<br>...<br>...第五条 质量保证<br>5.1 乙方对所供设备提供 <span class="bg-green-100 text-green-600 px-0.5 rounded font-medium">12</span> 个月的质量保证期。<br>5.2 质保期内，乙方应在接到维修通知后 <span class="bg-green-100 text-green-600 px-0.5 rounded font-medium">48 小时内响应，72 小时内到达现场</span>。<br>...<br>7.3 甲方违约的，违约金上限为合同总价的5%；乙方违约的，违约金上限为合同总价的<span class="bg-green-100 text-green-600 px-0.5 rounded font-medium">10%</span>。'
+    }
+
+    function showGrammarErrors() {
+      document.getElementById('errorStats').innerHTML =
+        '<div class="bg-red-50 rounded-lg px-3 py-2 text-xs"><span class="font-semibold text-red-600">3</span> <span class="text-red-500">处错误</span></div>' +
+        '<div class="bg-yellow-50 rounded-lg px-3 py-2 text-xs"><span class="font-semibold text-yellow-600">2</span> <span class="text-yellow-500">处建议</span></div>'
+      document.getElementById('errorList').innerHTML =
+        '<div class="border border-red-200 rounded-lg p-3 bg-red-50/30"><div class="flex items-start gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></div><div><p class="text-xs font-medium text-red-600">用词不当</p><p class="text-sm text-gray-700 mt-0.5"><span class="bg-red-100 px-0.5 rounded line-through">截至</span> → <span class="bg-green-100 px-0.5 rounded font-medium">截止</span></p><p class="text-[10px] text-gray-400 mt-0.5">建议：' + String.fromCharCode(8220) + '截止' + String.fromCharCode(8221) + '表示到某个期限停止，' + String.fromCharCode(8220) + '截至' + String.fromCharCode(8221) + '表示到某个时间为止</p></div></div></div>' +
+        '<div class="border border-red-200 rounded-lg p-3 bg-red-50/30"><div class="flex items-start gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></div><div><p class="text-xs font-medium text-red-600">多余空格</p><p class="text-sm text-gray-700 mt-0.5">第 3.2 条 中的 <span class="bg-red-100 px-0.5 rounded line-through">5,000,000.00</span> → <span class="bg-green-100 px-0.5 rounded font-medium">5,000,000.00</span>（数字间不应有空格）</p></div></div></div>' +
+        '<div class="border border-red-200 rounded-lg p-3 bg-red-50/30"><div class="flex items-start gap-2"><div class="w-1.5 h-1.5 rounded-full bg-red-500 mt-1.5 shrink-0"></div><div><p class="text-xs font-medium text-red-600">标点错误</p><p class="text-sm text-gray-700 mt-0.5"><span class="bg-red-100 px-0.5 rounded line-through">,</span> → <span class="bg-green-100 px-0.5 rounded font-medium">，</span>（应使用中文标点）</p></div></div></div>'
+    }
+
+    // ========== Action buttons ==========
+    document.getElementById('reviewBtn').onclick = function() {
+      localStorage.setItem('tool_result', convertedText)
+      localStorage.setItem('tool_type', type)
+      navTo('review.html?step=1')
+    }
+
+    document.getElementById('recheckBtn').onclick = function() { goStep(0) }
+
+    document.getElementById('copyBtn').onclick = function() {
+      var txt = previewArea.textContent || ''
+      if (navigator.clipboard) { navigator.clipboard.writeText(txt).then(function() { alert('已复制到剪贴板') }) }
+    }
+
+    document.getElementById('downloadBtn').onclick = function() {
+      var txt = previewArea.textContent || ''
+      var blob = new Blob([txt], { type: 'text/plain' })
+      var a = document.createElement('a')
+      a.href = URL.createObjectURL(blob)
+      a.download = (currentFile ? currentFile.name.replace(/\.[^.]+$/, '') : 'result') + '.txt'
+      a.click()
+    }
+
+    document.getElementById('finalDownloadBtn').onclick = function() { document.getElementById('downloadBtn').click() }
+
+    // ========== File input browse button ==========
+    document.getElementById('convertBtnText').textContent = cfg.name === '图片转文字' ? '开始识别' :
+      cfg.name === '格式转换' ? '开始转换' :
+      cfg.name === '智能纠错' ? '开始检查' :
+      cfg.name === '文档对比' ? '开始比对' :
+      '开始转换'
+    document.getElementById('convertBtnIcon').className = 'fa-solid ' + (
+      cfg.name === '图片转文字' ? 'fa-eye' :
+      cfg.name === '格式转换' ? 'fa-arrows-rotate' :
+      cfg.name === '智能纠错' ? 'fa-magnifying-glass' :
+      cfg.name === '文档对比' ? 'fa-right-left' :
+      'fa-wand-magic-sparkles'
+    )
+  </script>
+</body>
+</html>
