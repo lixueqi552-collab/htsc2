@@ -443,7 +443,7 @@
     document.getElementById('reviewBtn').onclick = function() {
       localStorage.setItem('tool_result', convertedText)
       localStorage.setItem('tool_type', type)
-      navTo('review.html?step=1')
+      navTo('review.html?from_tool=1')
     }
 
     document.getElementById('recheckBtn').onclick = function() { goStep(0) }

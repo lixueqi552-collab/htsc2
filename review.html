@@ -70,116 +70,231 @@
       <!-- Step Indicators -->
       <div class="flex items-center gap-0 mb-6 bg-white rounded-lg p-1 border border-gray-100">
         <div class="step-item flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md" data-step="0" style="background:#1677ff;color:#fff">
-          <div class="w-1.5 h-1.5 rounded-full bg-current"></div> 上传文档
+          <div class="w-1.5 h-1.5 rounded-full bg-current"></div> 上传与设置
         </div>
         <div class="step-item flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="1">
-          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 识别分类
+          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 文档解析
         </div>
         <div class="step-item flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="2">
-          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 审查要求
+          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> AI 审查
         </div>
         <div class="step-item flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="3">
-          <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> AI 审查中
-        </div>
-        <div class="step-item flex-1 flex items-center justify-center gap-1.5 py-2.5 text-xs font-medium rounded-md text-gray-400" data-step="4">
           <div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> 审查报告
         </div>
       </div>
 
-      <!-- Step 0: Upload -->
-      <div id="step-0" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8 min-h-[400px]" style="display:none">
-        <div id="dropZone" class="border-2 border-dashed rounded-xl p-10 text-center cursor-pointer transition-colors" style="border-color:#d9d9d9">
-          <i class="fa-solid fa-cloud-arrow-up text-4xl mb-3" style="color:#d9d9d9"></i>
-          <p class="text-sm font-medium text-gray-700 mb-1">拖拽文件到此处，或点击浏览</p>
-          <p class="text-xs text-gray-400">支持 PDF、DOC、DOCX 格式 · 单个文件 ≤ 50MB</p>
-          <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx" style="display:none">
-          <button id="selectFileBtn" class="inline-block mt-4 border border-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors text-sm cursor-pointer">选择文件</button>
-        </div>
-        <div id="fileList" class="mt-4 space-y-1.5" style="display:none"></div>
-        <div class="flex items-center justify-between mt-6 pt-4 border-t border-gray-100">
-          <span id="fileCount" class="text-xs text-gray-400">已选择 0 个文件</span>
-          <button id="uploadBtn" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2" disabled>
-            <i class="fa-solid fa-search"></i> 上传并识别
-          </button>
+      <!-- Step 0: Upload & Requirements -->
+      <div id="step-0" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8 min-h-[400px]">
+        <div class="max-w-4xl mx-auto">
+          <!-- 审查设置 -->
+          <div class="mb-6">
+            <h3 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-sliders text-[#1677ff]"></i> 审查设置
+            </h3>
+            <div class="space-y-4">
+              <!-- 审查立场 -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">您代表哪一方 <span class="text-red-500">*</span></label>
+                <div class="flex flex-wrap gap-2" id="stanceContainer">
+                  <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="甲方">甲方</button>
+                  <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="乙方">乙方</button>
+                  <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="丙方">丙方</button>
+                  <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="XX公司">XX公司</button>
+                  <div class="flex items-center gap-1">
+                    <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="其他" id="stanceOtherBtn">其他</button>
+                    <input type="text" id="stanceOtherInput" class="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] w-24 hidden" placeholder="请输入">
+                  </div>
+                </div>
+                <input type="hidden" id="reviewStance" value="">
+              </div>
+
+              <!-- 审查尺度 + 审核强度 并排 -->
+              <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- 审查尺度 -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">审查尺度 <span class="text-red-500">*</span></label>
+                  <div class="space-y-1.5" id="scaleContainer">
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all scale-option">
+                      <input type="radio" name="reviewScale" value="强势" class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">强势</span>
+                        <p class="text-xs text-gray-400">可大幅修改，争取有利条款</p>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-[#1677ff] bg-blue-50 cursor-pointer scale-option">
+                      <input type="radio" name="reviewScale" value="中立" checked class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">中立</span>
+                        <p class="text-xs text-gray-400">权利义务对等，完善可操作性</p>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all scale-option">
+                      <input type="radio" name="reviewScale" value="弱势" class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">弱势</span>
+                        <p class="text-xs text-gray-400">守住底线，提示风险为主</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+
+                <!-- 审核强度 -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">审核强度 <span class="text-red-500">*</span></label>
+                  <div class="space-y-1.5" id="intensityContainer">
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all intensity-option">
+                      <input type="radio" name="reviewIntensity" value="宽松" class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">宽松</span>
+                        <p class="text-xs text-gray-400">日常模板、低金额</p>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-[#1677ff] bg-blue-50 cursor-pointer intensity-option">
+                      <input type="radio" name="reviewIntensity" value="标准" checked class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">标准</span>
+                        <p class="text-xs text-gray-400">常规业务合同</p>
+                      </div>
+                    </label>
+                    <label class="flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all intensity-option">
+                      <input type="radio" name="reviewIntensity" value="严谨" class="w-4 h-4 accent-[#1677ff]">
+                      <div>
+                        <span class="text-sm font-medium text-gray-700">严谨</span>
+                        <p class="text-xs text-gray-400">大金额、高风险、涉诉</p>
+                      </div>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 自设审查需求 -->
+          <div class="mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2">
+              <i class="fa-solid fa-pen-to-square text-[#1677ff] mr-1"></i> 自设审查需求
+              <span class="text-xs font-normal text-gray-400">（选填）</span>
+            </label>
+            <textarea id="customRequirement" class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] min-h-[80px] bg-white" rows="2" placeholder="例如：重点关注知识产权归属、保密期限、违约金比例等具体条款..."></textarea>
+          </div>
+
+          <!-- 上传合同文件 -->
+          <div class="mb-6">
+            <h3 class="text-base font-semibold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-cloud-arrow-up text-[#1677ff]"></i> 上传合同文件
+            </h3>
+            <!-- 从辅助工具导入的文件显示 -->
+            <div id="importedFileArea" class="hidden border-2 border-[#1677ff] rounded-xl p-6 bg-blue-50/30">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-lg bg-[#1677ff]/10 flex items-center justify-center">
+                  <i class="fa-solid fa-file-import text-[#1677ff]"></i>
+                </div>
+                <div class="flex-1">
+                  <p class="text-sm font-medium text-gray-800">已从辅助工具导入</p>
+                  <p id="importedFileName" class="text-xs text-gray-500">转换后的文档内容</p>
+                </div>
+                <button id="clearImportBtn" class="text-gray-400 hover:text-red-500 text-sm flex items-center gap-1">
+                  <i class="fa-solid fa-trash-can"></i> 清除
+                </button>
+              </div>
+            </div>
+            <!-- 正常上传区域 -->
+            <div id="dropZone" class="border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-colors min-h-[180px] flex flex-col items-center justify-center" style="border-color:#d9d9d9">
+              <i class="fa-solid fa-cloud-arrow-up text-3xl mb-3" style="color:#d9d9d9"></i>
+              <p class="text-sm font-medium text-gray-700 mb-1">拖拽文件到此处，或点击浏览</p>
+              <p class="text-xs text-gray-400">支持 PDF、DOC、DOCX 格式 · 单个文件 ≤ 50MB</p>
+              <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx" style="display:none">
+              <button id="selectFileBtn" class="inline-block mt-3 border border-gray-200 text-gray-700 px-4 py-2 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors text-sm cursor-pointer">选择文件</button>
+            </div>
+            <div id="fileList" class="mt-3 space-y-1.5" style="display:none"></div>
+            <p id="fileCount" class="text-xs text-gray-400 mt-2">已选择 0 个文件</p>
+          </div>
+
+          <!-- 底部按钮 -->
+          <div class="flex justify-center mt-8 pt-6 border-t border-gray-100">
+            <button id="startReviewBtn" class="bg-[#1677ff] text-white px-10 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2 shadow-md disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+              <i class="fa-solid fa-file-magnifying-glass"></i> 开始审查
+            </button>
+          </div>
         </div>
       </div>
 
-      <!-- Step 1: Classify -->
+      <!-- Step 1: Document Parsing -->
       <div id="step-1" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8 min-h-[400px]" style="display:none">
-        <div class="text-center py-8">
-          <i class="fa-solid fa-circle-check text-5xl mb-4" style="color:#52c41a"></i>
-          <h3 class="text-base font-semibold text-gray-800 mb-1">文件识别完成</h3>
-          <p class="text-sm text-gray-500 mb-6">AI 已自动识别以下文件类型，请确认</p>
-          <div id="classifyList" class="max-w-md mx-auto space-y-3"></div>
-          <button onclick="goStep(2)" class="mt-6 bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2 mx-auto">确认，下一步 <i class="fa-solid fa-arrow-right"></i></button>
+        <div class="flex flex-col items-center justify-center py-20">
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center mb-6 shadow-sm">
+            <i class="fa-solid fa-file-arrow-up text-3xl text-[#1677ff]"></i>
+          </div>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">正在解析文档</h3>
+          <p class="text-sm text-gray-500 mb-8">读取文档内容，转换为可分析格式</p>
+          <div class="w-64">
+            <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
+              <div id="parseProgress" class="h-full rounded-full bg-gradient-to-r from-[#1677ff] to-[#4096ff] transition-all duration-300" style="width:0%"></div>
+            </div>
+            <p id="parsePercent" class="text-xs text-gray-400 mt-3 text-center">0%</p>
+          </div>
         </div>
       </div>
 
-      <!-- Step 2: Requirements -->
+      <!-- Step 2: AI Reviewing -->
       <div id="step-2" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8 min-h-[400px]" style="display:none">
-        <div class="max-w-2xl mx-auto">
-          <h3 class="text-base font-semibold text-gray-800 text-center mb-6">填写审查要求</h3>
-          <div class="bg-gray-50 rounded-xl p-6 space-y-5">
-            <div class="grid grid-cols-2 gap-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1.5">合同类型 <span class="text-red-500">*</span></label>
-                <select id="contractType" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-                  <option>采购合同</option><option>销售合同</option><option>服务合同</option><option>租赁合同</option><option>保密协议</option><option>其他</option>
-                </select>
-              </div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1.5">审阅人 <span class="text-red-500">*</span></label><input type="text" id="reviewerName" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" placeholder="请输入审阅人姓名"></div>
-            </div>
-            <div class="grid grid-cols-2 gap-4">
-              <div><label class="block text-sm font-medium text-gray-700 mb-1.5">审查立场 <span class="text-red-500">*</span></label>
-                <select id="reviewStance" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-                  <option>甲方</option><option>乙方</option><option>丙方</option>
-                </select>
-              </div>
-              <div><label class="block text-sm font-medium text-gray-700 mb-1.5">审查尺度 <span class="text-red-500">*</span></label>
-                <select id="reviewScale" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-                  <option>强势</option><option selected>中立</option><option>弱势</option>
-                </select>
-              </div>
-            </div>
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">审查点清单 <span class="text-gray-400 font-normal text-xs">（点击选择，可多选）</span></label>
-              <div class="flex flex-wrap gap-2" id="reviewPointsContainer"></div>
-            </div>
-            <div><label class="block text-sm font-medium text-gray-700 mb-1.5">自设审查需求</label>
-              <textarea class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20 min-h-[90px]" rows="3" placeholder="例如：重点关注知识产权归属、保密期限、违约金比例等具体条款..."></textarea>
-            </div>
+        <div class="flex flex-col items-center justify-center py-16">
+          <!-- 主图标 -->
+          <div class="w-20 h-20 rounded-full bg-gradient-to-br from-blue-50 to-blue-100 flex items-center justify-center mb-6 shadow-sm">
+            <i class="fa-solid fa-brain text-3xl text-[#1677ff]"></i>
           </div>
-          <div class="flex justify-center gap-3 mt-6">
-            <button onclick="goStep(1)" class="border border-gray-200 text-gray-700 px-5 py-2.5 rounded-lg font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center gap-1"><i class="fa-solid fa-arrow-left"></i> 返回</button>
-            <button onclick="startReview()" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-2"><i class="fa-solid fa-file-magnifying-glass"></i> 开始审查</button>
+          <h3 class="text-lg font-semibold text-gray-800 mb-2">AI 正在审查合同</h3>
+          <p class="text-sm text-gray-500 mb-10">正在分析合同内容，请稍候...</p>
+          
+          <!-- 进度步骤 -->
+          <div class="w-full max-w-lg">
+            <div class="flex items-center justify-between mb-8">
+              <!-- 步骤1 -->
+              <div class="flex flex-col items-center">
+                <div id="dot0" class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2 shadow-sm">
+                  <i class="fa-solid fa-check text-white text-sm"></i>
+                </div>
+                <span class="text-xs text-gray-600">识别类型</span>
+              </div>
+              <!-- 连线 -->
+              <div class="flex-1 h-0.5 bg-green-500 mx-2"></div>
+              <!-- 步骤2 -->
+              <div class="flex flex-col items-center">
+                <div id="dot1" class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2 shadow-sm">
+                  <i class="fa-solid fa-check text-white text-sm"></i>
+                </div>
+                <span class="text-xs text-gray-600">提取要点</span>
+              </div>
+              <!-- 连线 -->
+              <div id="line1" class="flex-1 h-0.5 bg-green-500 mx-2"></div>
+              <!-- 步骤3 -->
+              <div class="flex flex-col items-center">
+                <div id="dot2" class="w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center mb-2 shadow-sm">
+                  <i class="fa-solid fa-spinner fa-spin text-white text-sm"></i>
+                </div>
+                <span class="text-xs text-[#1677ff] font-medium">分析条款</span>
+              </div>
+              <!-- 连线 -->
+              <div id="line2" class="flex-1 h-0.5 bg-gray-200 mx-2"></div>
+              <!-- 步骤4 -->
+              <div class="flex flex-col items-center">
+                <div id="dot3" class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center mb-2">
+                  <i class="fa-solid fa-gavel text-gray-400 text-sm"></i>
+                </div>
+                <span class="text-xs text-gray-400">多维审查</span>
+              </div>
+            </div>
+            
+            <!-- 当前状态说明 -->
+            <div id="statusText" class="text-center">
+              <p class="text-sm text-gray-600">正在<span class="text-[#1677ff] font-medium">分析合同条款</span>，逐条拆解理解...</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Step 3: AI Reviewing -->
-      <div id="step-3" class="bg-white rounded-xl border border-gray-100 p-6 lg:p-8 min-h-[400px]" style="display:none">
-        <div class="text-center py-16">
-          <div class="w-16 h-16 rounded-full bg-blue-50 flex items-center justify-center mx-auto mb-5">
-            <i class="fa-solid fa-spinner text-2xl text-[#1677ff] fa-spin"></i>
-          </div>
-          <h3 class="text-base font-semibold text-gray-800 mb-1">AI 正在审查合同</h3>
-          <p class="text-sm text-gray-500 mb-8">正在逐条分析合同条款，请稍候...</p>
-          <div class="flex items-center justify-center gap-1 max-w-xs mx-auto">
-            <div class="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden"><div id="prog0" class="h-full rounded-full bg-[#1677ff]" style="width:100%"></div></div>
-            <div class="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden"><div id="prog1" class="h-full rounded-full bg-[#1677ff]" style="width:100%"></div></div>
-            <div class="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden"><div id="prog2" class="h-full rounded-full bg-[#1677ff]" style="width:60%"></div></div>
-            <div class="flex-1 h-2 rounded-full bg-gray-200 overflow-hidden"><div id="prog3" class="h-full rounded-full bg-[#1677ff]" style="width:0%"></div></div>
-          </div>
-          <div class="flex items-center justify-center gap-6 mt-8 text-xs text-gray-400">
-            <span id="status0" class="flex items-center gap-1" style="color:#52c41a"><i class="fa-solid fa-file-lines"></i> 文件解析 ✓</span>
-            <span id="status1" class="flex items-center gap-1" style="color:#52c41a"><i class="fa-solid fa-search"></i> 类型识别 ✓</span>
-            <span id="status2" class="flex items-center gap-1" style="color:#1677ff"><i class="fa-solid fa-spinner fa-spin"></i> AI 审查中</span>
-            <span id="status3" class="flex items-center gap-1 text-gray-400"><i class="fa-solid fa-file-pen"></i> 生成报告</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 4: Report -->
-      <div id="step-4" style="display:none">
+      <!-- Step 3: Report -->
+      <div id="step-3" style="display:none">
         <div class="flex items-center justify-between mb-3">
           <div class="flex items-center gap-3">
             <h3 class="text-base font-semibold text-gray-800">审查报告</h3>
@@ -499,31 +614,101 @@
     var u = getAuthUser()
     if (u) { document.getElementById('userName').textContent = u.name; document.getElementById('userAvatar').textContent = u.name[0] }
 
-    const REVIEW_POINTS = ['全面审查（所有审查点）','风险条款专项审查','合规性专项审查','权利义务对等性审查','知识产权条款审查','违约责任条款审查','保密条款审查','争议解决条款审查'];
-    let selectedPoints = [];
     let currentFile = null;
+    let selectedStance = '';
+    let importedFromTool = false;
+    let importedContent = '';
 
     var urlParams = new URLSearchParams(window.location.search)
 
-    const container = document.getElementById('reviewPointsContainer');
-    REVIEW_POINTS.forEach(p => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors bg-white border border-gray-200 text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff]';
-      btn.textContent = p;
+    // 检测是否从辅助工具导入
+    if (urlParams.get('from_tool') === '1') {
+      const toolResult = localStorage.getItem('tool_result');
+      const toolType = localStorage.getItem('tool_type');
+      if (toolResult) {
+        importedFromTool = true;
+        importedContent = toolResult;
+        // 显示导入区域，隐藏上传区域
+        document.getElementById('importedFileArea').classList.remove('hidden');
+        document.getElementById('dropZone').style.display = 'none';
+        document.getElementById('fileCount').style.display = 'none';
+        // 设置导入文件名
+        const toolNames = {
+          pdf2word: 'PDF转Word',
+          ocr: '图片转文字',
+          tablextract: '表格提取'
+        };
+        document.getElementById('importedFileName').textContent = (toolNames[toolType] || '辅助工具') + ' - 转换后的文档内容';
+        // 启用开始审查按钮
+        document.getElementById('startReviewBtn').disabled = false;
+      }
+    }
+
+    // 清除导入的文件
+    document.getElementById('clearImportBtn').onclick = () => {
+      importedFromTool = false;
+      importedContent = '';
+      localStorage.removeItem('tool_result');
+      localStorage.removeItem('tool_type');
+      document.getElementById('importedFileArea').classList.add('hidden');
+      document.getElementById('dropZone').style.display = '';
+      document.getElementById('fileCount').style.display = '';
+      document.getElementById('startReviewBtn').disabled = true;
+    };
+
+    // 立场选择按钮交互
+    const stanceBtns = document.querySelectorAll('.stance-btn');
+    const stanceOtherInput = document.getElementById('stanceOtherInput');
+    const stanceOtherBtn = document.getElementById('stanceOtherBtn');
+    const reviewStanceInput = document.getElementById('reviewStance');
+
+    stanceBtns.forEach(btn => {
       btn.onclick = () => {
-        const idx = selectedPoints.indexOf(p);
-        if (idx > -1) { selectedPoints.splice(idx,1); btn.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors bg-white border border-gray-200 text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff]'; }
-        else { selectedPoints.push(p); btn.className = 'inline-flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm transition-colors bg-[#1677ff] text-white'; }
+        stanceBtns.forEach(b => {
+          b.className = 'stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all';
+        });
+        btn.className = 'stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-[#1677ff] bg-[#1677ff] text-white transition-all';
+        selectedStance = btn.dataset.value;
+        if (btn.dataset.value === '其他') {
+          stanceOtherInput.classList.remove('hidden');
+          stanceOtherInput.focus();
+        } else {
+          stanceOtherInput.classList.add('hidden');
+          stanceOtherInput.value = '';
+        }
+        reviewStanceInput.value = selectedStance;
       };
-      container.appendChild(btn);
+    });
+
+    stanceOtherInput.oninput = () => {
+      reviewStanceInput.value = stanceOtherInput.value || '其他';
+    };
+
+    // 审查尺度 radio 样式切换
+    document.querySelectorAll('input[name="reviewScale"]').forEach(radio => {
+      radio.onchange = () => {
+        document.querySelectorAll('.scale-option').forEach(opt => {
+          opt.className = 'flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all scale-option';
+        });
+        radio.closest('.scale-option').className = 'flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-[#1677ff] bg-blue-50 cursor-pointer scale-option';
+      };
+    });
+
+    // 审核强度 radio 样式切换
+    document.querySelectorAll('input[name="reviewIntensity"]').forEach(radio => {
+      radio.onchange = () => {
+        document.querySelectorAll('.intensity-option').forEach(opt => {
+          opt.className = 'flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-gray-200 bg-white cursor-pointer hover:border-[#1677ff] transition-all intensity-option';
+        });
+        radio.closest('.intensity-option').className = 'flex items-center gap-2.5 p-2.5 rounded-lg border-2 border-[#1677ff] bg-blue-50 cursor-pointer intensity-option';
+      };
     });
 
     const dropZone = document.getElementById('dropZone');
     const fileInput = document.getElementById('fileInput');
     const fileList = document.getElementById('fileList');
     const fileCount = document.getElementById('fileCount');
-    const uploadBtn = document.getElementById('uploadBtn');
+    const startReviewBtn = document.getElementById('startReviewBtn');
     const backBtn = document.getElementById('backBtn');
     const homeBtn = document.getElementById('homeBtn');
 
@@ -542,66 +727,90 @@
         const size = f.size > 1024*1024 ? (f.size/1024/1024).toFixed(1)+' MB' : (f.size/1024).toFixed(0)+' KB';
         const div = document.createElement('div');
         div.className = 'flex items-center justify-between py-2 px-3 rounded-lg bg-gray-50';
-        div.innerHTML = '<div class="flex items-center gap-2"><i class="fa-regular fa-file-lines" style="color:#1677ff"></i><span class="text-sm text-gray-700">'+f.name+'</span><span class="text-[10px] text-gray-400">'+size+'</span></div><button onclick="this.parentElement.remove()" class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash-can"></i></button>';
+        div.innerHTML = '<div class="flex items-center gap-2"><i class="fa-regular fa-file-lines" style="color:#1677ff"></i><span class="text-sm text-gray-700">'+f.name+'</span><span class="text-[10px] text-gray-400">'+size+'</span></div><button onclick="this.parentElement.remove();checkFiles()" class="text-gray-400 hover:text-red-500 text-xs"><i class="fa-solid fa-trash-can"></i></button>';
         fileList.appendChild(div);
       });
       fileCount.textContent = '已选择 ' + files.length + ' 个文件';
-      uploadBtn.disabled = false;
+      checkFiles();
     }
 
-    uploadBtn.onclick = () => { if (currentFile) goStep(1); };
+    function checkFiles() {
+      const hasFile = fileList.children.length > 0;
+      startReviewBtn.disabled = !hasFile && !importedFromTool;
+    }
 
     const stepItems = document.querySelectorAll('.step-item');
-    const steps = ['step-0','step-1','step-2','step-3','step-4'];
+    const steps = ['step-0','step-1','step-2','step-3'];
+    const stepNames = ['上传与设置','文档解析','AI 审查','审查报告'];
 
     function goStep(n) {
       steps.forEach((id, i) => {
         document.getElementById(id).style.display = i === n ? '' : 'none';
         const el = stepItems[i];
-        if (i < n) { el.style.background = ''; el.style.color = '#16a34a'; el.innerHTML = '<i class="fa-solid fa-check text-xs"></i> '+['上传文档','识别分类','审查要求','AI 审查中','审查报告'][i]; }
-        else if (i === n) { el.style.background = '#1677ff'; el.style.color = '#fff'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-current"></div> '+['上传文档','识别分类','审查要求','AI 审查中','审查报告'][i]; }
-        else { el.style.background = ''; el.style.color = '#9ca3af'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> '+['上传文档','识别分类','审查要求','AI 审查中','审查报告'][i]; }
+        if (i < n) { el.style.background = ''; el.style.color = '#16a34a'; el.innerHTML = '<i class="fa-solid fa-check text-xs"></i> '+stepNames[i]; }
+        else if (i === n) { el.style.background = '#1677ff'; el.style.color = '#fff'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-current"></div> '+stepNames[i]; }
+        else { el.style.background = ''; el.style.color = '#9ca3af'; el.innerHTML = '<div class="w-1.5 h-1.5 rounded-full bg-gray-300"></div> '+stepNames[i]; }
       });
-      backBtn.style.display = n > 0 && n < 4 ? '' : 'none';
-      homeBtn.style.display = n === 4 ? '' : 'none';
-      if (n === 1) renderClassify();
-    }
-
-    function renderClassify() {
-      const list = document.getElementById('classifyList');
-      const toolResult = localStorage.getItem('tool_result');
-      const toolType = localStorage.getItem('tool_type');
-      let fileName = '设备采购框架协议.pdf';
-      let fileTag = '采购合同';
-      if (currentFile) {
-        fileName = currentFile.name;
-      } else if (toolResult) {
-        var names = { pdf2word: 'PDF 转换结果.txt', ocr: 'OCR 识别结果.txt', tablextract: '表格提取结果.txt' };
-        fileName = names[toolType] || '转换结果.txt';
-        fileTag = toolType === 'pdf2word' ? 'PDF 转 Word' : toolType === 'ocr' ? '图片文字识别' : toolType === 'tablextract' ? '表格提取' : '辅助工具';
-      }
-      list.innerHTML = '<div class="flex items-center justify-between p-3 rounded-lg border border-gray-100 bg-gray-50 text-left">' +
-        '<div class="flex items-center gap-2"><i class="fa-regular fa-file-lines" style="color:#1677ff"></i><div><p class="text-sm font-medium text-gray-700">' + fileName + '</p><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600 mt-0.5">' + fileTag + '</span></div></div>' +
-        '<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600"><i class="fa-solid fa-check mr-1"></i>识别完成</span>' +
-      '</div>';
+      backBtn.style.display = n > 0 && n < 3 ? '' : 'none';
+      homeBtn.style.display = n === 3 ? '' : 'none';
     }
 
     backBtn.onclick = () => { const cur = steps.findIndex(id => document.getElementById(id).style.display !== 'none'); goStep(Math.max(0, cur - 1)); };
     homeBtn.onclick = () => navTo('dashboard.html');
 
-    function startReview() {
-      goStep(3);
+    // 开始审查按钮
+    startReviewBtn.onclick = () => {
+      goStep(1);
+      // 模拟文档解析进度
+      let progress = 0;
+      const parseProgress = document.getElementById('parseProgress');
+      const parsePercent = document.getElementById('parsePercent');
+      const timer = setInterval(() => {
+        progress += Math.random() * 15 + 5;
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(timer);
+          setTimeout(() => {
+            goStep(2);
+            startAIReview();
+          }, 300);
+        }
+        parseProgress.style.width = progress + '%';
+        parsePercent.textContent = Math.round(progress) + '%';
+      }, 200);
+    };
+
+    function startAIReview() {
+      // 阶段3完成：分析条款 → 多维审查
       setTimeout(() => {
-        document.getElementById('status2').innerHTML = '<i class="fa-solid fa-check"></i> AI 审查完成';
-        document.getElementById('status2').style.color = '#52c41a';
-        document.getElementById('status3').innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> 生成报告';
-        document.getElementById('status3').style.color = '#1677ff';
-        document.getElementById('prog3').style.width = '100%';
+        // 更新步骤3为完成
+        document.getElementById('dot2').className = 'w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2 shadow-sm';
+        document.getElementById('dot2').innerHTML = '<i class="fa-solid fa-check text-white text-sm"></i>';
+        document.querySelector('#dot2 + span').className = 'text-xs text-gray-600';
+        
+        // 更新连线
+        document.getElementById('line2').className = 'flex-1 h-0.5 bg-[#1677ff] mx-2';
+        
+        // 更新步骤4为进行中
+        document.getElementById('dot3').className = 'w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center mb-2 shadow-sm';
+        document.getElementById('dot3').innerHTML = '<i class="fa-solid fa-spinner fa-spin text-white text-sm"></i>';
+        document.querySelector('#dot3 + span').className = 'text-xs text-[#1677ff] font-medium';
+        
+        // 更新状态文字
+        document.getElementById('statusText').innerHTML = '<p class="text-sm text-gray-600">正在进行<span class="text-[#1677ff] font-medium">多维度审查</span>（法律、合规、风险、财务）...</p>';
       }, 2400);
+      
+      // 阶段4完成
       setTimeout(() => {
-        document.getElementById('status3').innerHTML = '<i class="fa-solid fa-check"></i> 报告已生成';
-        document.getElementById('status3').style.color = '#52c41a';
-        goStep(4);
+        // 更新步骤4为完成
+        document.getElementById('dot3').className = 'w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2 shadow-sm';
+        document.getElementById('dot3').innerHTML = '<i class="fa-solid fa-check text-white text-sm"></i>';
+        document.querySelector('#dot3 + span').className = 'text-xs text-gray-600';
+        
+        // 更新状态文字
+        document.getElementById('statusText').innerHTML = '<p class="text-sm text-green-600 font-medium"><i class="fa-solid fa-check-circle mr-1"></i>审查完成，正在生成报告...</p>';
+        
+        setTimeout(() => goStep(3), 600);
       }, 4800);
     }
 
@@ -657,9 +866,7 @@
     }
 
     if (urlParams.get('report') === '1') {
-      goStep(4);
-    } else if (urlParams.get('step') === '1') {
-      goStep(1);
+      goStep(3);
     } else {
       goStep(0);
     }
