@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>合同审查 — 智能合同审查</title>
+  <title>合同审查 — AI合同审查系统</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,7 +28,7 @@
         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-[15px] font-bold shadow-sm">
           <i class="fa-regular fa-file-lines" style="font-size:18px"></i>
         </div>
-        <span class="font-semibold text-base text-gray-900">智能合同审查</span>
+        <span class="font-semibold text-base text-gray-900">AI合同审查系统</span>
       </div>
       <nav class="flex items-center gap-1">
         <button onclick="navTo('dashboard.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
@@ -59,7 +60,7 @@
     <div>
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h1 class="text-2xl font-bold text-gray-900">智能审查</h1>
+          <h1 class="text-2xl font-bold text-gray-900">合同审查列表</h1>
           <p class="text-base text-gray-500 mt-1">管理所有合同审查任务，查看审查报告</p>
         </div>
         <button onclick="navTo('review.html')" class="bg-[#1677ff] text-white px-6 py-3 rounded-lg font-semibold text-base hover:bg-[#0958d9] transition-colors flex items-center gap-2 shadow-sm">
@@ -80,13 +81,14 @@
           <table class="w-full text-sm">
             <thead>
               <tr class="bg-gray-50 text-left">
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[140px]">合同编号</th>
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500">审查文档名称</th>
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[90px]">文档权限</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[130px]">合同编号</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500">合同名称</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[90px]">合同类型</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[100px]">合同金额</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[80px]">审查立场</th>
                 <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[80px]">创建人</th>
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[80px]">状态</th>
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[150px]">上传时间</th>
-                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[200px]">操作</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[140px]">上传时间</th>
+                <th class="py-3.5 px-4 text-sm font-medium text-gray-500 w-[180px]">操作</th>
               </tr>
             </thead>
             <tbody id="tableBody" class="divide-y divide-gray-50"></tbody>
@@ -98,50 +100,60 @@
     </div>
   </main>
 
-  <!-- Edit Modal -->
-  <div id="editModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" style="display:none" onclick="closeEditModal()">
-    <div class="bg-white rounded-xl max-w-lg w-full mx-4 shadow-xl" onclick="event.stopPropagation()">
+  <!-- Export Modal -->
+  <div id="exportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" style="display:none" onclick="closeExportModal()">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4 shadow-xl" onclick="event.stopPropagation()">
       <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
-        <span class="text-sm font-semibold text-gray-800 flex items-center gap-1.5"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 编辑合同信息</span>
-        <button onclick="closeEditModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+        <span class="text-sm font-semibold text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-download text-[#1677ff]"></i> 导出审查报告</span>
+        <button onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
       </div>
-      <div class="p-5 space-y-4">
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">合同编号</label>
-          <input type="text" id="editId" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm bg-gray-50 text-gray-500" readonly>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1.5">审查文档名称</label>
-          <input type="text" id="editName" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">文档权限</label>
-            <select id="editPermission" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-              <option>仅自己</option><option>团队</option><option>所有人</option>
-            </select>
-          </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">创建人</label>
-            <input type="text" id="editCreator" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20">
-          </div>
-        </div>
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">状态</label>
-            <select id="editStatus" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" onchange="toggleEditScore()">
-              <option value="completed">审查完成</option><option value="reviewing">审查中</option><option value="pending">待审查</option><option value="risk">有风险</option>
-            </select>
-          </div>
-          <div id="editScoreGroup">
-            <label class="block text-sm font-medium text-gray-700 mb-1.5">评分</label>
-            <input type="number" id="editScore" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] focus:ring-1 focus:ring-[#1677ff]/20" min="0" max="100" placeholder="0-100">
-          </div>
+      <div class="p-5">
+        <p class="text-sm text-gray-500 mb-4">请选择导出格式：</p>
+        <div class="space-y-3">
+          <!-- 原始文档 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="original" class="mt-1" checked>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-word text-blue-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">原始文档</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">导出原始合同文件，保持原有格式</p>
+            </div>
+          </label>
+          <!-- 批注版 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="annotated" class="mt-1">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-pen text-yellow-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">批注版文档</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">在原文中嵌入审查批注，便于对照查看</p>
+            </div>
+          </label>
+          <!-- 审查意见书 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="report" class="mt-1">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-lines text-green-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">审查意见书</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">独立的审查报告，包含风险分析与建议</p>
+            </div>
+          </label>
         </div>
       </div>
       <div class="flex items-center justify-end gap-3 px-5 py-3.5 border-t border-gray-100">
-        <button onclick="closeEditModal()" class="border border-gray-200 text-gray-600 px-5 py-2 rounded-lg text-sm font-medium hover:border-gray-300 transition-colors">取消</button>
-        <button onclick="saveEdit()" class="bg-[#1677ff] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-check"></i> 保存</button>
+        <button onclick="closeExportModal()" class="border border-gray-200 text-gray-600 px-5 py-2 rounded-lg text-sm font-medium hover:border-gray-300 transition-colors">取消</button>
+        <button onclick="doExport()" class="bg-[#1677ff] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-download"></i> 导出</button>
       </div>
     </div>
   </div>
@@ -156,21 +168,26 @@
     if (u) { document.getElementById('userName').textContent = u.name; document.getElementById('userAvatar').textContent = u.name[0] }
 
     const mockData = [
-      { id: 'CT-2026-001', name: '设备采购框架协议.pdf', permission: '仅自己', creator: '张明', status: 'completed', time: '2026-05-14 09:30', score: 88 },
-      { id: 'CT-2026-002', name: 'IT 运维服务合同.docx', permission: '团队', creator: '李华', status: 'reviewing', time: '2026-05-14 10:15', score: null },
-      { id: 'CT-2026-003', name: '保密协议-v3.pdf', permission: '仅自己', creator: '张明', status: 'pending', time: '2026-05-13 16:45', score: null },
-      { id: 'CT-2026-004', name: '办公楼租赁协议.pdf', permission: '所有人', creator: '王磊', status: 'risk', time: '2026-05-13 14:20', score: 65 },
-      { id: 'CT-2026-005', name: '软件许可及服务协议.pdf', permission: '团队', creator: '李华', status: 'completed', time: '2026-05-12 11:00', score: 92 },
-      { id: 'CT-2026-006', name: '货物运输合同.pdf', permission: '仅自己', creator: '张明', status: 'completed', time: '2026-05-11 15:30', score: 78 },
-      { id: 'CT-2026-007', name: '技术服务合同.docx', permission: '团队', creator: '赵丽', status: 'pending', time: '2026-05-10 09:00', score: null },
-      { id: 'CT-2026-008', name: '年度采购框架协议.pdf', permission: '所有人', creator: '王磊', status: 'completed', time: '2026-05-09 13:45', score: 85 },
+      { id: 'CT-2026-001', name: '设备采购框架协议', type: '采购合同', amount: '5,000,000', stance: '甲方', risk: 'low', creator: '张明', time: '2026-05-14 09:30', score: 88 },
+      { id: 'CT-2026-002', name: 'IT运维服务合同', type: '服务合同', amount: '800,000', stance: '甲方', risk: 'medium', creator: '李华', time: '2026-05-14 10:15', score: 72 },
+      { id: 'CT-2026-003', name: '保密协议', type: '保密协议', amount: '-', stance: '乙方', risk: 'low', creator: '张明', time: '2026-05-13 16:45', score: 90 },
+      { id: 'CT-2026-004', name: '办公楼租赁协议', type: '租赁合同', amount: '1,200,000/年', stance: '乙方', risk: 'high', creator: '王磊', time: '2026-05-13 14:20', score: 58 },
+      { id: 'CT-2026-005', name: '软件许可及服务协议', type: '许可合同', amount: '350,000', stance: '甲方', risk: 'low', creator: '李华', time: '2026-05-12 11:00', score: 92 },
+      { id: 'CT-2026-006', name: '货物运输合同', type: '运输合同', amount: '200,000', stance: '甲方', risk: 'medium', creator: '张明', time: '2026-05-11 15:30', score: 75 },
+      { id: 'CT-2026-007', name: '技术服务合同', type: '服务合同', amount: '600,000', stance: '乙方', risk: 'low', creator: '赵丽', time: '2026-05-10 09:00', score: 85 },
+      { id: 'CT-2026-008', name: '年度采购框架协议', type: '采购合同', amount: '12,000,000', stance: '甲方', risk: 'medium', creator: '王磊', time: '2026-05-09 13:45', score: 70 },
     ]
 
-    const statusConfig = {
-      completed: { label: '审查完成', class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600' },
-      reviewing: { label: '审查中', class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600' },
-      pending: { label: '待审查', class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-600' },
-      risk: { label: '有风险', class: 'inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-600' },
+    const riskConfig = {
+      high: { label: '高风险', class: 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-600', icon: '<i class="fa-solid fa-triangle-exclamation"></i>' },
+      medium: { label: '一般风险', class: 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-600', icon: '<i class="fa-solid fa-circle-exclamation"></i>' },
+      low: { label: '低风险', class: 'inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600', icon: '<i class="fa-solid fa-circle-check"></i>' },
+    }
+
+    const stanceColors = {
+      '甲方': 'bg-blue-50 text-blue-600',
+      '乙方': 'bg-green-50 text-green-600',
+      '丙方': 'bg-purple-50 text-purple-600',
     }
 
     const perPage = 6
@@ -179,7 +196,7 @@
 
     function render() {
       const kw = search.toLowerCase()
-      const filtered = mockData.filter(r => r.name.toLowerCase().includes(kw))
+      const filtered = mockData.filter(r => r.name.toLowerCase().includes(kw) || r.id.toLowerCase().includes(kw) || r.type.toLowerCase().includes(kw))
       const totalPages = Math.ceil(filtered.length / perPage)
       const safePage = Math.min(page, Math.max(1, totalPages))
       const paged = filtered.slice((safePage - 1) * perPage, safePage * perPage)
@@ -188,22 +205,24 @@
 
       const tbody = document.getElementById('tableBody')
       if (paged.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="7" class="py-12 text-center text-sm text-gray-400">暂无数据</td></tr>'
+        tbody.innerHTML = '<tr><td colspan="8" class="py-12 text-center text-sm text-gray-400">暂无数据</td></tr>'
       } else {
         tbody.innerHTML = paged.map(r => {
-          const info = statusConfig[r.status]
+          const risk = riskConfig[r.risk]
+          const stanceClass = stanceColors[r.stance] || 'bg-gray-50 text-gray-600'
           return `<tr class="hover:bg-gray-50 transition-colors">
             <td class="py-3.5 px-4 text-sm text-gray-600 font-mono">${r.id}</td>
-            <td class="py-3.5 px-4"><span class="text-base text-gray-800 font-medium">${r.name}</span></td>
-            <td class="py-3.5 px-4 text-sm text-gray-500">${r.permission}</td>
-            <td class="py-3.5 px-4 text-sm text-gray-600">${r.creator}</td>
-            <td class="py-3.5 px-4"><span class="${info.class}">${info.label}</span></td>
-            <td class="py-3.5 px-4 text-sm text-gray-500">${r.time}</td>
+            <td class="py-3.5 px-4"><span class="text-sm text-gray-800 font-medium">${r.name}</span></td>
+            <td class="py-3.5 px-4 text-sm text-gray-500">${r.type}</td>
+            <td class="py-3.5 px-4 text-sm text-gray-600 font-medium">${r.amount === '-' ? '-' : '¥' + r.amount}</td>
+            <td class="py-3.5 px-4"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${stanceClass}">${r.stance}</span></td>
+            <td class="py-3.5 px-4 text-sm text-gray-500">${r.creator}</td>
+            <td class="py-3.5 px-4 text-sm text-gray-400">${r.time}</td>
             <td class="py-3.5 px-4">
-              <div class="flex items-center gap-2">
-                <button onclick="navTo('review.html?report=1')" class="flex items-center gap-1 px-3 py-2 rounded text-sm text-[#1677ff] hover:bg-blue-50 transition-colors"><i class="fa-regular fa-eye"></i> 查看</button>
-                <button onclick="openEditModal('${r.id}')" class="flex items-center gap-1 px-3 py-2 rounded text-sm text-gray-500 hover:bg-gray-100 transition-colors"><i class="fa-regular fa-pen-to-square"></i> 编辑</button>
-                <button class="flex items-center gap-1 px-3 py-2 rounded text-sm text-red-500 hover:bg-red-50 transition-colors"><i class="fa-regular fa-trash-can"></i> 删除</button>
+              <div class="flex items-center gap-1">
+                <button onclick="navTo('review.html?report=1')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-[#1677ff] hover:bg-blue-50 transition-colors"><i class="fa-solid fa-eye"></i> 查看</button>
+                <button onclick="openExportModal('${r.id}')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"><i class="fa-solid fa-download"></i> 导出</button>
+                <button onclick="deleteItem('${r.id}')" class="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-xs font-medium text-gray-400 hover:text-red-500 hover:bg-red-50 transition-colors"><i class="fa-solid fa-trash-can"></i></button>
               </div>
             </td>
           </tr>`
@@ -228,7 +247,7 @@
     }
 
     function goPage(n) {
-      const filtered = mockData.filter(r => r.name.toLowerCase().includes(search.toLowerCase()))
+      const filtered = mockData.filter(r => r.name.toLowerCase().includes(search.toLowerCase()) || r.id.toLowerCase().includes(search.toLowerCase()) || r.type.toLowerCase().includes(search.toLowerCase()))
       const totalPages = Math.ceil(filtered.length / perPage)
       page = Math.max(1, Math.min(n, totalPages))
       render()
@@ -240,44 +259,280 @@
       render()
     })
 
-    var editingId = null
+    var exportingId = null
 
-    function openEditModal(id) {
-      editingId = id
-      var item = mockData.find(function(r) { return r.id === id })
-      if (!item) return
-      document.getElementById('editId').value = item.id
-      document.getElementById('editName').value = item.name
-      document.getElementById('editPermission').value = item.permission
-      document.getElementById('editCreator').value = item.creator
-      document.getElementById('editStatus').value = item.status
-      document.getElementById('editScore').value = item.score || ''
-      toggleEditScore()
-      document.getElementById('editModal').style.display = ''
+    function openExportModal(id) {
+      exportingId = id
+      document.getElementById('exportModal').style.display = ''
     }
 
-    function closeEditModal() {
-      document.getElementById('editModal').style.display = 'none'
-      editingId = null
+    function closeExportModal() {
+      document.getElementById('exportModal').style.display = 'none'
+      exportingId = null
     }
 
-    function toggleEditScore() {
-      var v = document.getElementById('editStatus').value
-      document.getElementById('editScoreGroup').style.display = (v === 'completed' || v === 'risk') ? '' : 'none'
+    function doExport() {
+      const format = document.querySelector('input[name="exportFormat"]:checked').value
+      const item = mockData.find(r => r.id === exportingId)
+      if (!item) {
+        alert('未找到合同信息')
+        return
+      }
+
+      // 检查 docx 库是否加载
+      if (typeof docx === 'undefined') {
+        alert('文档库未加载，请刷新页面重试')
+        console.error('docx library not loaded')
+        return
+      }
+
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx
+
+      if (format === 'original') {
+        // 原始文档
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '原始合同文档', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(item.id)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(item.name)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun(item.type)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun(item.amount === '-' ? '未约定' : '¥' + item.amount)] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '合同正文', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '鉴于甲方需要采购相关设备，双方经友好协商，达成如下协议：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第一条 合同标的', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方同意向乙方购买，乙方同意向甲方出售本合同附件所列设备。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第二条 合同金额', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: `本合同总金额为人民币${item.amount === '-' ? '（待定）' : item.amount + '元'}（含税）。` }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第三条 交付期限', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方应在合同生效后60个自然日内完成交付。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第四条 验收标准', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到货物后7个工作日内完成验收。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第五条 质量保证', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方对所供设备提供12个月质保服务。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第六条 付款方式', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到乙方发票后30个工作日内支付相应款项。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第七条 违约责任', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '任何一方违反本合同约定，应向守约方支付合同总价10%的违约金。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第八条 保密条款', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '双方应对本合同内容及履行过程中获知的对方商业秘密承担保密义务。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第九条 争议解决', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '因本合同引起的争议，双方应协商解决；协商不成的，提交甲方所在地人民法院诉讼解决。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第十条 其他', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同一式两份，双方各执一份，具有同等法律效力。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方（盖章）：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方（盖章）：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '签署日期：', bold: true }), new TextRun(item.time.split(' ')[0])] }),
+            ]
+          }]
+        })
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `${item.name}.docx`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }).catch(err => {
+          console.error('导出失败:', err)
+          alert('导出失败: ' + err.message)
+        })
+      } else if (format === 'annotated') {
+        // 批注版文档
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '合同审查批注版', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(item.id)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(item.name)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun(item.type)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun(item.amount === '-' ? '未约定' : '¥' + item.amount)] }),
+              new Paragraph({ children: [new TextRun({ text: '审查立场：', bold: true }), new TextRun(item.stance)] }),
+              new Paragraph({ children: [new TextRun({ text: '风险等级：', bold: true }), new TextRun(riskConfig[item.risk].label)] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '合同正文（含批注）', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方：', bold: true }), new TextRun('XX科技有限公司（采购方）')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方：', bold: true }), new TextRun('YY设备制造有限公司（供应方）')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '鉴于甲方需要采购相关设备，双方经友好协商，达成如下协议：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第一条 合同标的', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方同意向乙方购买，乙方同意向甲方出售本合同附件所列设备。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第二条 合同金额', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: `本合同总金额为人民币${item.amount === '-' ? '（待定）' : item.amount + '元'}（含税）。` }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第三条 交付期限', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方应在合同生效后60个自然日内完成交付。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第四条 验收标准', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到货物后7个工作日内完成验收。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注】', color: '1677ff', bold: true }), new TextRun({ text: '建议增加量化验收标准，如设备开机成功率≥99%等具体参数。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第五条 质量保证', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方对所供设备提供12个月质保服务。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注】', color: '1677ff', bold: true }), new TextRun({ text: '质保期限合理，建议明确质保期内响应时限。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第六条 付款方式', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到乙方发票后30个工作日内支付相应款项。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '付款期限约定不够明确，建议细化分阶段付款计划。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第七条 违约责任', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '任何一方违反本合同约定，应向守约方支付合同总价10%的违约金。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '违约责任条款需关注双方权利义务对等性。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第八条 保密条款', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '双方应对本合同内容及履行过程中获知的对方商业秘密承担保密义务。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '建议增加保密期限条款，如"合同期间及终止后3年内"。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第九条 争议解决', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '因本合同引起的争议，双方应协商解决；协商不成的，提交甲方所在地人民法院诉讼解决。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '管辖约定需确认是否符合双方意愿。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第十条 其他', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同一式两份，双方各执一份，具有同等法律效力。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方（盖章）：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方（盖章）：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '签署日期：', bold: true }), new TextRun(item.time.split(' ')[0])] }),
+            ]
+          }]
+        })
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `${item.name}_批注版.docx`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }).catch(err => {
+          console.error('导出失败:', err)
+          alert('导出失败: ' + err.message)
+        })
+      } else if (format === 'report') {
+        // 审查意见书
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '合同审查意见书', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '报告编号：', bold: true }), new TextRun(`RPT-${item.id}-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`)] }),
+              new Paragraph({ children: [new TextRun({ text: '生成时间：', bold: true }), new TextRun(new Date().toLocaleString('zh-CN'))] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '一、合同基本信息', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(item.id)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(item.name)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun(item.type)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun(item.amount === '-' ? '未约定' : '¥' + item.amount)] }),
+              new Paragraph({ children: [new TextRun({ text: '审查立场：', bold: true }), new TextRun(item.stance)] }),
+              new Paragraph({ children: [new TextRun({ text: '风险等级：', bold: true }), new TextRun(riskConfig[item.risk].label)] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '二、审查结论', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '经审查，本合同存在以下问题：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '【高风险问题】', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 违约责任不对等', bold: true }),
+              new Paragraph({ text: '   位置：第7条' }),
+              new Paragraph({ text: '   问题：双方违约金差距较大，可能被认定为显失公平' }),
+              new Paragraph({ text: '   建议：统一调整违约金比例或缩小差距' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '2. 争议解决条款不明确', bold: true }),
+              new Paragraph({ text: '   位置：第9条' }),
+              new Paragraph({ text: '   问题：管辖法院约定可能存在争议' }),
+              new Paragraph({ text: '   建议：明确具体管辖法院或仲裁机构' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '【一般风险问题】', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 付款节点模糊', bold: true }),
+              new Paragraph({ text: '   位置：第6条' }),
+              new Paragraph({ text: '   问题：付款期限约定不够明确' }),
+              new Paragraph({ text: '   建议：细化分阶段付款计划及具体期限' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '2. 保密义务期限缺失', bold: true }),
+              new Paragraph({ text: '   位置：第8条' }),
+              new Paragraph({ text: '   问题：未明确保密期限' }),
+              new Paragraph({ text: '   建议：增加保密期限条款' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '三、完善建议', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 建议对违约责任条款进行修订，确保双方权利义务对等' }),
+              new Paragraph({ text: '2. 建议明确争议解决方式及管辖机构' }),
+              new Paragraph({ text: '3. 建议细化付款条款，明确各阶段付款时间节点' }),
+              new Paragraph({ text: '4. 建议增加保密期限条款' }),
+              new Paragraph({ text: '5. 建议在验收标准中增加量化指标' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '四、法律依据', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 《中华人民共和国民法典》第585条' }),
+              new Paragraph({ text: '2. 《中华人民共和国民法典》第497条' }),
+              new Paragraph({ text: '3. 《中华人民共和国民事诉讼法》第35条' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '五、声明', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '本审查意见书仅供参考，不构成法律意见。如有疑问，请咨询专业律师。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '智能合同审查系统 生成', alignment: AlignmentType.CENTER, color: '999999' }),
+            ]
+          }]
+        })
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob)
+          const a = document.createElement('a')
+          a.href = url
+          a.download = `${item.name}_审查意见书.docx`
+          document.body.appendChild(a)
+          a.click()
+          document.body.removeChild(a)
+          URL.revokeObjectURL(url)
+        }).catch(err => {
+          console.error('导出失败:', err)
+          alert('导出失败: ' + err.message)
+        })
+      }
+
+      closeExportModal()
     }
 
-    function saveEdit() {
-      if (!editingId) return
-      var item = mockData.find(function(r) { return r.id === editingId })
-      if (!item) return
-      item.name = document.getElementById('editName').value
-      item.permission = document.getElementById('editPermission').value
-      item.creator = document.getElementById('editCreator').value
-      item.status = document.getElementById('editStatus').value
-      var scoreVal = document.getElementById('editScore').value
-      item.score = scoreVal ? parseInt(scoreVal) : null
-      closeEditModal()
-      render()
+    function deleteItem(id) {
+      if (confirm('确定要删除该合同记录吗？')) {
+        const idx = mockData.findIndex(r => r.id === id)
+        if (idx > -1) {
+          mockData.splice(idx, 1)
+          render()
+        }
+      }
     }
 
     render()

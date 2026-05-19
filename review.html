@@ -3,8 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>审查流程 — 智能合同审查</title>
+  <title>审查流程 — AI合同审查系统</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/docx@8.2.0/build/index.umd.min.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -27,7 +28,7 @@
         <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-[#1677ff] to-[#4096ff] flex items-center justify-center text-white text-[15px] font-bold shadow-sm">
           <i class="fa-regular fa-file-lines" style="font-size:18px"></i>
         </div>
-        <span class="font-semibold text-base text-gray-900">智能合同审查</span>
+        <span class="font-semibold text-base text-gray-900">AI合同审查系统</span>
       </div>
       <nav class="flex items-center gap-1">
         <button onclick="navTo('dashboard.html')" class="flex items-center gap-2 px-5 py-2.5 rounded-lg text-[15px] transition-colors duration-200 text-gray-500 hover:text-gray-700 hover:bg-gray-50">
@@ -101,7 +102,7 @@
                   <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="丙方">丙方</button>
                   <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="XX公司">XX公司</button>
                   <div class="flex items-center gap-1">
-                    <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="其他" id="stanceOtherBtn">其他</button>
+                    <button type="button" class="stance-btn inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium border-2 border-gray-200 bg-white text-gray-600 hover:border-[#1677ff] hover:text-[#1677ff] transition-all" data-value="其他" id="stanceOtherBtn">其他（请输入）</button>
                     <input type="text" id="stanceOtherInput" class="px-3 py-2 border-2 border-gray-200 rounded-lg text-sm focus:outline-none focus:border-[#1677ff] w-24 hidden" placeholder="请输入">
                   </div>
                 </div>
@@ -226,7 +227,7 @@
             <i class="fa-solid fa-file-arrow-up text-3xl text-[#1677ff]"></i>
           </div>
           <h3 class="text-lg font-semibold text-gray-800 mb-2">正在解析文档</h3>
-          <p class="text-sm text-gray-500 mb-8">读取文档内容，转换为可分析格式</p>
+          <p class="text-sm text-gray-500 mb-8">读取文档内容，输出标准 Markdown 文本</p>
           <div class="w-64">
             <div class="h-1.5 rounded-full bg-gray-100 overflow-hidden">
               <div id="parseProgress" class="h-full rounded-full bg-gradient-to-r from-[#1677ff] to-[#4096ff] transition-all duration-300" style="width:0%"></div>
@@ -254,7 +255,7 @@
                 <div id="dot0" class="w-8 h-8 rounded-full bg-green-500 flex items-center justify-center mb-2 shadow-sm">
                   <i class="fa-solid fa-check text-white text-sm"></i>
                 </div>
-                <span class="text-xs text-gray-600">识别类型</span>
+                <span class="text-xs text-gray-600">识别分类</span>
               </div>
               <!-- 连线 -->
               <div class="flex-1 h-0.5 bg-green-500 mx-2"></div>
@@ -266,7 +267,7 @@
                 <span class="text-xs text-gray-600">提取要点</span>
               </div>
               <!-- 连线 -->
-              <div id="line1" class="flex-1 h-0.5 bg-green-500 mx-2"></div>
+              <div id="line1" class="flex-1 h-0.5 bg-[#1677ff] mx-2"></div>
               <!-- 步骤3 -->
               <div class="flex flex-col items-center">
                 <div id="dot2" class="w-8 h-8 rounded-full bg-[#1677ff] flex items-center justify-center mb-2 shadow-sm">
@@ -284,7 +285,7 @@
                 <span class="text-xs text-gray-400">多维审查</span>
               </div>
             </div>
-            
+
             <!-- 当前状态说明 -->
             <div id="statusText" class="text-center">
               <p class="text-sm text-gray-600">正在<span class="text-[#1677ff] font-medium">分析合同条款</span>，逐条拆解理解...</p>
@@ -301,16 +302,9 @@
             <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">审查完成</span>
           </div>
           <div class="flex items-center gap-2">
-            <div class="relative group">
-              <button class="bg-[#1677ff] text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-1.5">
-                <i class="fa-solid fa-download"></i> 导出报告
-              </button>
-              <div class="absolute right-0 top-full mt-1 w-44 bg-white rounded-lg shadow-lg border border-gray-100 hidden group-hover:block z-10">
-                <button class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-t-lg border-b border-gray-50"><i class="fa-regular fa-file-lines" style="color:gray"></i> 原始文档</button>
-                <button class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 border-b border-gray-50"><i class="fa-regular fa-file-lines" style="color:#1677ff"></i> 批注版</button>
-                <button class="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 flex items-center gap-2 rounded-b-lg"><i class="fa-regular fa-file-lines" style="color:#52c41a"></i> 审查意见书</button>
-              </div>
-            </div>
+            <button onclick="openExportModal()" class="bg-[#1677ff] text-white px-4 py-2 rounded-lg text-xs font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-1.5">
+              <i class="fa-solid fa-download"></i> 导出报告
+            </button>
             <button onclick="goStep(2)" class="border border-gray-200 text-gray-700 px-3 py-2 rounded-lg text-xs font-medium hover:border-[#1677ff] hover:text-[#1677ff] transition-colors flex items-center gap-1"><i class="fa-solid fa-arrow-left"></i> 重新审查</button>
           </div>
         </div>
@@ -388,24 +382,62 @@
                 <div class="bg-white rounded-xl border border-gray-100 overflow-hidden">
                   <div class="bg-gray-50 px-4 py-2.5 border-b border-gray-100"><span class="text-xs font-semibold text-gray-700">合同概要</span></div>
                   <div class="p-4 space-y-4">
+                    <!-- 合同主体 -->
                     <div>
-                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">基础信息</p>
-                      <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <div><span class="text-gray-400">合同名称：</span><span class="text-gray-700">设备采购框架协议</span></div>
-                        <div><span class="text-gray-400">合同编号：</span><span class="text-gray-700">CT-2026-001</span></div>
-                        <div><span class="text-gray-400">签署日期：</span><span class="text-gray-700">2026-05-01</span></div>
-                        <div><span class="text-gray-400">合同类型：</span><span class="text-gray-700">采购合同</span></div>
-                        <div><span class="text-gray-400">甲方：</span><span class="text-gray-700">XX科技有限公司</span></div>
-                        <div><span class="text-gray-400">乙方：</span><span class="text-gray-700">YY设备制造有限公司</span></div>
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">合同主体</p>
+                      <div class="space-y-1.5 text-sm">
+                        <div class="flex items-center gap-2"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-50 text-blue-600">甲方</span><span class="text-gray-700">XX科技有限公司</span><span class="text-xs text-gray-400">（采购方）</span></div>
+                        <div class="flex items-center gap-2"><span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">乙方</span><span class="text-gray-700">YY设备制造有限公司</span><span class="text-xs text-gray-400">（供应方）</span></div>
                       </div>
                     </div>
+                    <!-- 合同标的 -->
                     <div class="border-t border-gray-100 pt-3">
-                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">交易信息</p>
-                      <div class="grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                        <div class="col-span-2"><span class="text-gray-400">合同总价：</span><span class="text-gray-700 font-medium">¥5,000,000.00</span></div>
-                        <div class="col-span-2"><span class="text-gray-400">付款方式：</span><span class="text-gray-700">甲方应在收到乙方发票后支付相应款项</span></div>
-                        <div class="col-span-2"><span class="text-gray-400">交付期限：</span><span class="text-gray-700">合同生效后 60 个自然日内</span></div>
-                        <div><span class="text-gray-400">质保期：</span><span class="text-gray-700">自验收合格之日起 12 个月</span></div>
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">合同标的</p>
+                      <p class="text-sm text-gray-700">IT设备采购（服务器、交换机、防火墙等）</p>
+                    </div>
+                    <!-- 核心目的 -->
+                    <div class="border-t border-gray-100 pt-3">
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">各方核心目的</p>
+                      <div class="text-sm text-gray-700 space-y-1">
+                        <div><span class="text-gray-400">甲方：</span>获取符合技术要求的IT设备，保障业务运行</div>
+                        <div><span class="text-gray-400">乙方：</span>按约交付设备并收取货款，实现销售收益</div>
+                      </div>
+                    </div>
+                    <!-- 关键时间节点 -->
+                    <div class="border-t border-gray-100 pt-3">
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">关键时间节点</p>
+                      <div class="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
+                        <div><span class="text-gray-400">签署日期：</span><span class="text-gray-700">2026-05-01</span></div>
+                        <div><span class="text-gray-400">交付期限：</span><span class="text-gray-700">60个自然日内</span></div>
+                        <div><span class="text-gray-400">验收期限：</span><span class="text-gray-700">7个工作日内</span></div>
+                        <div><span class="text-gray-400">质保期限：</span><span class="text-gray-700">12个月</span></div>
+                      </div>
+                    </div>
+                    <!-- 交易金额 -->
+                    <div class="border-t border-gray-100 pt-3">
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">交易金额</p>
+                      <div class="flex items-center gap-2">
+                        <span class="text-lg font-semibold text-gray-800">¥5,000,000.00</span>
+                        <span class="text-xs text-gray-400">（含税，税率13%）</span>
+                      </div>
+                    </div>
+                    <!-- 特殊交易特征 -->
+                    <div class="border-t border-gray-100 pt-3">
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">特殊交易特征</p>
+                      <div class="flex flex-wrap gap-1.5">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">框架协议</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">分期交付</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600">含质保服务</span>
+                      </div>
+                    </div>
+                    <!-- 初步风险信号 -->
+                    <div class="border-t border-gray-100 pt-3">
+                      <p class="text-[10px] text-gray-400 font-medium mb-1.5 uppercase tracking-wider">初步风险信号</p>
+                      <div class="flex flex-wrap gap-1.5">
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-red-50 text-red-600"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 违约责任不对等</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-red-50 text-red-600"><i class="fa-solid fa-triangle-exclamation text-[10px]"></i> 管辖约定不明</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-yellow-50 text-yellow-600"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> 付款节点模糊</span>
+                        <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-xs bg-yellow-50 text-yellow-600"><i class="fa-solid fa-circle-exclamation text-[10px]"></i> 保密期限缺失</span>
                       </div>
                     </div>
                   </div>
@@ -414,172 +446,265 @@
 
               <!-- Risk Tab -->
               <div id="right-risk" style="display:none" class="space-y-3">
-                <div class="flex gap-0 bg-gray-100 rounded-lg p-0.5">
-                  <button onclick="switchRiskTab('high')" id="rsk-high" class="flex-1 py-1.5 text-xs font-medium rounded-md bg-red-500 text-white shadow-sm">高风险点 (2)</button>
-                  <button onclick="switchRiskTab('medium')" id="rsk-medium" class="flex-1 py-1.5 text-xs font-medium rounded-md text-yellow-600 hover:text-yellow-700">一般风险点 (2)</button>
-                  <button onclick="switchRiskTab('safe')" id="rsk-safe" class="flex-1 py-1.5 text-xs font-medium rounded-md text-green-600 hover:text-green-700">无风险点 (3)</button>
-                </div>
-
-                <!-- High Risk -->
-                <div id="risk-high" class="space-y-2">
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-7.3')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-600">高风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">违约责任不对等</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 7.3 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
-                    </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">该条款存在明显的权利义务不对等。甲方（采购方）违约责任上限仅为5%，而乙方（供应方）高达15%，差距达3倍，违反了合同公平原则。若发生违约争议，该条款可能被认定为显失公平。</div>
+                <!-- 风险统计概览 -->
+                <div class="bg-white rounded-xl border border-gray-100 p-4">
+                  <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-3">
+                      <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-red-50 to-orange-50 flex items-center justify-center">
+                        <i class="fa-solid fa-shield-halved text-red-500"></i>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议将双方违约金上限统一调整为合同总价的10%，或采取差异化调整（甲方8%、乙方12%），以缩小差距至合理范围。</div>
+                      <div>
+                        <p class="text-sm font-semibold text-gray-800">风险审查结果</p>
+                        <p class="text-xs text-gray-400">共发现 4 个风险点</p>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-bookmark" style="color:#1677ff"></i> 依据</p>
-                        <div class="flex items-center gap-2"><span class="text-xs text-gray-600 flex items-center gap-1"><i class="fa-regular fa-file" style="color:gray"></i>《中华人民共和国民法典》.pdf</span><button onclick="showLaw('《中华人民共和国民法典》第585条：约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少。\n《民法典》第497条：提供格式条款一方不合理地免除或者减轻其责任、加重对方责任、限制对方主要权利的，该格式条款无效。','《中华人民共和国民法典》.pdf')" class="flex items-center gap-1 text-xs text-[#1677ff] hover:text-[#0958d9]"><i class="fa-solid fa-external-link-alt"></i> 查看详情</button></div>
+                    </div>
+                    <div class="flex gap-3">
+                      <div class="text-center">
+                        <p class="text-lg font-bold text-red-500">2</p>
+                        <p class="text-[10px] text-gray-400">高风险</p>
+                      </div>
+                      <div class="text-center">
+                        <p class="text-lg font-bold text-yellow-500">2</p>
+                        <p class="text-[10px] text-gray-400">一般</p>
+                      </div>
+                      <div class="text-center">
+                        <p class="text-lg font-bold text-green-500">3</p>
+                        <p class="text-[10px] text-gray-400">无风险</p>
                       </div>
                     </div>
                   </div>
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-12.1')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-50 text-red-600">高风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">争议解决条款缺失</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 12.1 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                </div>
+
+                <!-- 风险类型切换 -->
+                <div class="flex gap-2">
+                  <button onclick="switchRiskTab('high')" id="rsk-high" class="flex-1 py-2 text-xs font-medium rounded-lg bg-red-500 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-triangle-exclamation"></i> 高风险 <span class="bg-white/20 px-1.5 rounded">2</span>
+                  </button>
+                  <button onclick="switchRiskTab('medium')" id="rsk-medium" class="flex-1 py-2 text-xs font-medium rounded-lg bg-white border border-gray-200 text-yellow-600 hover:border-yellow-300 hover:bg-yellow-50 flex items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-circle-exclamation"></i> 一般风险 <span class="bg-yellow-100 px-1.5 rounded">2</span>
+                  </button>
+                  <button onclick="switchRiskTab('safe')" id="rsk-safe" class="flex-1 py-2 text-xs font-medium rounded-lg bg-white border border-gray-200 text-green-600 hover:border-green-300 hover:bg-green-50 flex items-center justify-center gap-1.5 transition-all">
+                    <i class="fa-solid fa-circle-check"></i> 无风险 <span class="bg-green-100 px-1.5 rounded">3</span>
+                  </button>
+                </div>
+
+                <!-- High Risk -->
+                <div id="risk-high" class="space-y-3">
+                  <!-- 高风险项1 -->
+                  <div class="bg-white rounded-xl border border-red-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-7.3')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-red-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">违约责任不对等</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 7.3 条 · 双方违约金差距达3倍</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                     </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">"有管辖权的法院"表述过于模糊，未明确具体的仲裁机构或诉讼法院，可能导致争议发生时双方就管辖权产生新的争议。</div>
+                    <div class="hidden border-t border-red-50">
+                      <div class="p-4 space-y-3 bg-red-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">该条款存在明显的权利义务不对等。甲方违约责任上限仅为5%，而乙方高达15%，差距达3倍，违反了合同公平原则。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 完善建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议将双方违约金上限统一调整为合同总价的10%，或采取差异化调整（甲方8%、乙方12%）。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-purple-50 flex items-center justify-center"><i class="fa-solid fa-book text-[10px] text-purple-500"></i></span> 法律依据
+                          </p>
+                          <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-600"><i class="fa-regular fa-file-lines mr-1 text-gray-400"></i>《中华人民共和国民法典》</span>
+                            <button onclick="showLaw('《中华人民共和国民法典》第585条：约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少。','《中华人民共和国民法典》')" class="text-xs text-[#1677ff] hover:underline">查看详情 →</button>
+                          </div>
+                        </div>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议明确约定争议解决方式：1) 如选择诉讼，应指定具体法院（如"甲方所在地人民法院"）；2) 如选择仲裁，应明确仲裁机构（如"深圳国际仲裁院"）。</div>
+                    </div>
+                  </div>
+                  <!-- 高风险项2 -->
+                  <div class="bg-white rounded-xl border border-red-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-12.1')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-red-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-red-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-triangle-exclamation text-red-500 text-sm"></i>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-bookmark" style="color:#1677ff"></i> 依据</p>
-                        <div class="flex items-center gap-2"><span class="text-xs text-gray-600 flex items-center gap-1"><i class="fa-regular fa-file" style="color:gray"></i>《中华人民共和国民事诉讼法》.pdf</span><button onclick="showLaw('《中华人民共和国民事诉讼法》第35条：合同或者其他财产权益纠纷的当事人可以书面协议选择被告住所地、合同履行地、合同签订地、原告住所地、标的物所在地等与争议有实际联系的地点的人民法院管辖。\n\n《中华人民共和国仲裁法》第16条：仲裁协议应当具有下列内容：（一）请求仲裁的意思表示；（二）仲裁事项；（三）选定的仲裁委员会。','《中华人民共和国民事诉讼法》.pdf')" class="flex items-center gap-1 text-xs text-[#1677ff] hover:text-[#0958d9]"><i class="fa-solid fa-external-link-alt"></i> 查看详情</button></div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">争议解决条款缺失</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 12.1 条 · 管辖约定不明确</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="hidden border-t border-red-50">
+                      <div class="p-4 space-y-3 bg-red-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">"有管辖权的法院"表述过于模糊，未明确具体的仲裁机构或诉讼法院，可能导致争议发生时双方就管辖权产生新的争议。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 完善建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议明确约定：1) 如选择诉讼，指定具体法院；2) 如选择仲裁，明确仲裁机构。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-purple-50 flex items-center justify-center"><i class="fa-solid fa-book text-[10px] text-purple-500"></i></span> 法律依据
+                          </p>
+                          <div class="flex items-center justify-between">
+                            <span class="text-xs text-gray-600"><i class="fa-regular fa-file-lines mr-1 text-gray-400"></i>《中华人民共和国民事诉讼法》</span>
+                            <button onclick="showLaw('《中华人民共和国民事诉讼法》第35条：合同纠纷的当事人可以书面协议选择管辖法院。','《中华人民共和国民事诉讼法》')" class="text-xs text-[#1677ff] hover:underline">查看详情 →</button>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Medium Risk -->
-                <div id="risk-medium" style="display:none" class="space-y-2">
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-3.5')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-600">一般风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">付款节点模糊</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 3.5 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
-                    </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">"收到发票后付款"未明确具体付款期限，可能导致甲方无限期延迟付款。</div>
+                <div id="risk-medium" style="display:none" class="space-y-3">
+                  <div class="bg-white rounded-xl border border-yellow-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-3.5')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-yellow-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-exclamation text-yellow-500 text-sm"></i>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议明确：1) 付款期限（如"收到发票后 30 个工作日内"）；2) 分阶段付款计划。</div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">付款节点模糊</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 3.5 条 · 未明确具体付款期限</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="hidden border-t border-yellow-50">
+                      <div class="p-4 space-y-3 bg-yellow-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">"收到发票后付款"未明确具体付款期限，可能导致甲方无限期延迟付款。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 完善建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议明确付款期限（如"收到发票后30个工作日内"）及分阶段付款计划。</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-8.1')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-yellow-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-50 text-yellow-600">一般风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">保密义务期限缺失</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 8.1 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
-                    </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">未明确保密期限可能导致保密义务的存续时间存在争议。</div>
+                  <div class="bg-white rounded-xl border border-yellow-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-8.1')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-yellow-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-exclamation text-yellow-500 text-sm"></i>
                       </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议增加保密期限条款：合同期间及合同终止后 3 年内，双方均应对涉及的商业秘密承担保密义务。</div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">保密义务期限缺失</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 8.1 条 · 保密期限约定不明</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
+                    </button>
+                    <div class="hidden border-t border-yellow-50">
+                      <div class="p-4 space-y-3 bg-yellow-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">未明确保密期限可能导致保密义务的存续时间存在争议。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 完善建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议增加保密期限条款：合同期间及合同终止后3年内承担保密义务。</p>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
                 <!-- Safe -->
-                <div id="risk-safe" style="display:none" class="space-y-2">
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-4')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">无风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">交付与验收</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 4 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                <div id="risk-safe" style="display:none" class="space-y-3">
+                  <div class="bg-white rounded-xl border border-green-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-4')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-green-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-check text-green-500 text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">交付与验收</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 4 条 · 条款约定清晰合理</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                     </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">该条款约定了明确的交付期限（60个自然日）和验收流程（7个工作日内），符合行业惯例，对双方权利义务划分清晰。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议在验收标准中增加量化指标，如设备开机成功率、故障率等具体参数，以减少验收环节的争议。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-bookmark" style="color:#1677ff"></i> 依据</p>
-                        <div class="flex items-center gap-2"><span class="text-xs text-gray-600 flex items-center gap-1"><i class="fa-regular fa-file" style="color:gray"></i>《中华人民共和国民法典》.pdf</span><button onclick="showLaw('《中华人民共和国民法典》第623条：买受人收到标的物时应当在约定的检验期限内检验。没有约定检验期限的，应当及时检验。','《中华人民共和国民法典》.pdf')" class="flex items-center gap-1 text-xs text-[#1677ff] hover:text-[#0958d9]"><i class="fa-solid fa-external-link-alt"></i> 查看详情</button></div>
+                    <div class="hidden border-t border-green-50">
+                      <div class="p-4 space-y-3 bg-green-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">该条款约定了明确的交付期限（60个自然日）和验收流程（7个工作日内），符合行业惯例。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 优化建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议在验收标准中增加量化指标，如设备开机成功率、故障率等具体参数。</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-5')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">无风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">质量保证</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 5 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                  <div class="bg-white rounded-xl border border-green-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-5')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-green-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-check text-green-500 text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">质量保证</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 5 条 · 质保期限约定明确</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                     </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">质保期限（12个月）和维修责任约定清晰，覆盖了产品的主要使用周期，对双方权利义务划分合理。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">建议明确质保期内响应的具体时限，如"乙方应在接到维修通知后 48 小时内响应，72 小时内到达现场"。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-bookmark" style="color:#1677ff"></i> 依据</p>
-                        <div class="flex items-center gap-2"><span class="text-xs text-gray-600 flex items-center gap-1"><i class="fa-regular fa-file" style="color:gray"></i>《中华人民共和国民法典》.pdf</span><button onclick="showLaw('《中华人民共和国民法典》第621条：当事人约定检验期限的，买受人应当在检验期限内将标的物的数量或者质量不符合约定的情形通知出卖人。','《中华人民共和国民法典》.pdf')" class="flex items-center gap-1 text-xs text-[#1677ff] hover:text-[#0958d9]"><i class="fa-solid fa-external-link-alt"></i> 查看详情</button></div>
+                    <div class="hidden border-t border-green-50">
+                      <div class="p-4 space-y-3 bg-green-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">质保期限（12个月）和维修责任约定清晰，覆盖了产品的主要使用周期。</p>
+                        </div>
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-green-50 flex items-center justify-center"><i class="fa-solid fa-lightbulb text-[10px] text-green-500"></i></span> 优化建议
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">建议明确质保期内响应时限，如"48小时内响应，72小时内到达现场"。</p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  <div class="rounded-lg border border-gray-100 overflow-hidden">
-                    <button onclick="toggleIssue(this);scrollToClause('clause-11')" class="w-full flex items-center gap-2 p-2.5 text-left hover:bg-gray-50 transition-colors">
-                      <div class="w-2 h-2 rounded-full bg-green-500 flex-shrink-0"></div>
-                      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-600">无风险</span>
-                      <span class="text-sm font-medium text-gray-800 flex-1">不可抗力</span>
-                      <span class="text-[11px] text-gray-400 bg-gray-100 px-2 py-0.5 rounded">第 11 条</span>
-                      <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+                  <div class="bg-white rounded-xl border border-green-100 overflow-hidden shadow-sm">
+                    <button onclick="toggleIssue(this);scrollToClause('clause-11')" class="w-full flex items-center gap-3 p-4 text-left hover:bg-green-50/50 transition-colors">
+                      <div class="w-8 h-8 rounded-lg bg-green-100 flex items-center justify-center flex-shrink-0">
+                        <i class="fa-solid fa-circle-check text-green-500 text-sm"></i>
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-semibold text-gray-800">不可抗力</p>
+                        <p class="text-xs text-gray-400 mt-0.5">第 11 条 · 条款表述规范</p>
+                      </div>
+                      <i class="fa-solid fa-chevron-down text-xs text-gray-400 transition-transform"></i>
                     </button>
-                    <div class="hidden px-3 pb-3 space-y-2 border-t border-gray-50 pt-2.5">
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-pen-to-square" style="color:#1677ff"></i> 审查意见</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">不可抗力条款内容完整，免责范围和法律后果约定清晰，符合法律要求。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-lightbulb" style="color:#1677ff"></i> 完善建议</p>
-                        <div contenteditable="true" class="text-sm text-gray-700 leading-relaxed outline-none focus:ring-1 focus:ring-[#1677ff]/20 rounded px-1.5 py-1 -mx-1.5 -my-1">条款已较为完整，无需修改。</div>
-                      </div>
-                      <div class="border border-gray-200 rounded-lg p-3">
-                        <p class="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><i class="fa-regular fa-bookmark" style="color:#1677ff"></i> 依据</p>
-                        <div class="flex items-center gap-2"><span class="text-xs text-gray-600 flex items-center gap-1"><i class="fa-regular fa-file" style="color:gray"></i>《中华人民共和国民法典》.pdf</span><button onclick="showLaw('《中华人民共和国民法典》第590条：当事人一方因不可抗力不能履行合同的，根据不可抗力的影响，部分或者全部免除责任，但是法律另有规定的除外。','《中华人民共和国民法典》.pdf')" class="flex items-center gap-1 text-xs text-[#1677ff] hover:text-[#0958d9]"><i class="fa-solid fa-external-link-alt"></i> 查看详情</button></div>
+                    <div class="hidden border-t border-green-50">
+                      <div class="p-4 space-y-3 bg-green-50/30">
+                        <div class="bg-white rounded-lg p-3 border border-gray-100">
+                          <p class="text-xs font-medium text-gray-500 mb-2 flex items-center gap-1.5">
+                            <span class="w-5 h-5 rounded bg-blue-50 flex items-center justify-center"><i class="fa-solid fa-pen text-[10px] text-blue-500"></i></span> 审查意见
+                          </p>
+                          <p class="text-sm text-gray-700 leading-relaxed">不可抗力条款表述规范，明确了免责情形，符合法律规定。</p>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -606,6 +731,64 @@
       </div>
       <div class="p-5 max-h-80 overflow-y-auto">
         <p id="lawBody" class="text-xs text-gray-700 leading-relaxed whitespace-pre-line"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="exportModal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/40" style="display:none" onclick="closeExportModal()">
+    <div class="bg-white rounded-xl max-w-md w-full mx-4 shadow-xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between px-5 py-3.5 border-b border-gray-100">
+        <span class="text-sm font-semibold text-gray-800 flex items-center gap-1.5"><i class="fa-solid fa-download text-[#1677ff]"></i> 导出审查报告</span>
+        <button onclick="closeExportModal()" class="text-gray-400 hover:text-gray-600"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="p-5">
+        <p class="text-sm text-gray-500 mb-4">请选择导出格式：</p>
+        <div class="space-y-3">
+          <!-- 原始文档 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="original" class="mt-1" checked>
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-blue-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-word text-blue-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">原始文档</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">导出原始合同文件，保持原有格式</p>
+            </div>
+          </label>
+          <!-- 批注版 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="annotated" class="mt-1">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-yellow-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-pen text-yellow-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">批注版文档</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">在原文中嵌入审查批注，便于对照查看</p>
+            </div>
+          </label>
+          <!-- 审查意见书 -->
+          <label class="flex items-start gap-3 p-3 rounded-lg border-2 border-gray-100 hover:border-[#1677ff] cursor-pointer transition-colors group">
+            <input type="radio" name="exportFormat" value="report" class="mt-1">
+            <div class="flex-1">
+              <div class="flex items-center gap-2">
+                <div class="w-8 h-8 rounded-lg bg-green-50 flex items-center justify-center">
+                  <i class="fa-solid fa-file-lines text-green-500"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-800">审查意见书</span>
+              </div>
+              <p class="text-xs text-gray-400 mt-1 ml-10">独立的审查报告，包含风险分析与建议</p>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="flex items-center justify-end gap-3 px-5 py-3.5 border-t border-gray-100">
+        <button onclick="closeExportModal()" class="border border-gray-200 text-gray-600 px-5 py-2 rounded-lg text-sm font-medium hover:border-gray-300 transition-colors">取消</button>
+        <button onclick="doExport()" class="bg-[#1677ff] text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-[#0958d9] transition-colors flex items-center gap-1.5"><i class="fa-solid fa-download"></i> 导出</button>
       </div>
     </div>
   </div>
@@ -825,8 +1008,23 @@
       ['high','medium','safe'].forEach(t => {
         document.getElementById('risk-' + t).style.display = t === tab ? '' : 'none';
         const btn = document.getElementById('rsk-' + t);
-        const colors = { high: { active: 'bg-red-500 text-white', inactive: 'text-red-600 hover:text-red-700' }, medium: { active: 'bg-yellow-500 text-white', inactive: 'text-yellow-600 hover:text-yellow-700' }, safe: { active: 'bg-green-500 text-white', inactive: 'text-green-600 hover:text-green-700' } };
-        btn.className = 'flex-1 py-1.5 text-xs font-medium rounded-md ' + (t === tab ? colors[t].active : colors[t].inactive);
+        if (t === tab) {
+          if (t === 'high') {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-red-500 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all';
+          } else if (t === 'medium') {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-yellow-500 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all';
+          } else {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-green-500 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all';
+          }
+        } else {
+          if (t === 'high') {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-white border border-gray-200 text-red-600 hover:border-red-300 hover:bg-red-50 flex items-center justify-center gap-1.5 transition-all';
+          } else if (t === 'medium') {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-white border border-gray-200 text-yellow-600 hover:border-yellow-300 hover:bg-yellow-50 flex items-center justify-center gap-1.5 transition-all';
+          } else {
+            btn.className = 'flex-1 py-2 text-xs font-medium rounded-lg bg-white border border-gray-200 text-green-600 hover:border-green-300 hover:bg-green-50 flex items-center justify-center gap-1.5 transition-all';
+          }
+        }
       });
     }
 
@@ -859,6 +1057,270 @@
     }
 
     function closeLaw() { document.getElementById('lawModal').style.display = 'none'; }
+
+    function openExportModal() {
+      document.getElementById('exportModal').style.display = '';
+    }
+
+    function closeExportModal() {
+      document.getElementById('exportModal').style.display = 'none';
+    }
+
+    function doExport() {
+      const format = document.querySelector('input[name="exportFormat"]:checked').value;
+      const contractName = '设备采购框架协议';
+      const contractId = 'CT-2026-001';
+
+      // 检查 docx 库是否加载
+      if (typeof docx === 'undefined') {
+        alert('文档库未加载，请刷新页面重试');
+        console.error('docx library not loaded');
+        return;
+      }
+
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel, AlignmentType } = docx;
+
+      if (format === 'original') {
+        // 原始文档
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '原始合同文档', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(contractId)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(contractName)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun('采购合同')] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun('¥5,000,000')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '合同正文', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '鉴于甲方需要采购相关设备，双方经友好协商，达成如下协议：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第一条 合同标的', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方同意向乙方购买，乙方同意向甲方出售本合同附件所列设备。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第二条 合同金额', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同总金额为人民币5,000,000元（含税）。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第三条 交付期限', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方应在合同生效后60个自然日内完成交付。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第四条 验收标准', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到货物后7个工作日内完成验收。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第五条 质量保证', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方对所供设备提供12个月质保服务。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第六条 付款方式', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到乙方发票后支付相应款项。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第七条 违约责任', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方违约责任上限为合同总价的5%，乙方违约责任上限为15%。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第八条 保密条款', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '双方应对本合同内容及履行过程中获知的对方商业秘密承担保密义务。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第九条 争议解决', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '因本合同引起的争议，双方应协商解决；协商不成的，提交有管辖权的法院诉讼解决。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第十条 其他', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同一式两份，双方各执一份，具有同等法律效力。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方（盖章）：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方（盖章）：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '签署日期：', bold: true }), new TextRun('2026-05-01')] }),
+            ]
+          }]
+        });
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${contractName}.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }).catch(err => {
+          console.error('导出失败:', err);
+          alert('导出失败: ' + err.message);
+        });
+      } else if (format === 'annotated') {
+        // 批注版文档
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '合同审查批注版', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(contractId)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(contractName)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun('采购合同')] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun('¥5,000,000')] }),
+              new Paragraph({ children: [new TextRun({ text: '审查立场：', bold: true }), new TextRun('甲方')] }),
+              new Paragraph({ children: [new TextRun({ text: '风险等级：', bold: true }), new TextRun('一般风险')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '合同正文（含批注）', heading: HeadingLevel.HEADING_1, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方：', bold: true }), new TextRun('XX科技有限公司（采购方）')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方：', bold: true }), new TextRun('YY设备制造有限公司（供应方）')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '鉴于甲方需要采购相关设备，双方经友好协商，达成如下协议：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第一条 合同标的', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方同意向乙方购买，乙方同意向甲方出售本合同附件所列设备。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第二条 合同金额', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同总金额为人民币5,000,000元（含税）。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第三条 交付期限', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方应在合同生效后60个自然日内完成交付。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第四条 验收标准', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到货物后7个工作日内完成验收。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注】', color: '1677ff', bold: true }), new TextRun({ text: '建议增加量化验收标准，如设备开机成功率≥99%等具体参数。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第五条 质量保证', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '乙方对所供设备提供12个月质保服务。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注】', color: '1677ff', bold: true }), new TextRun({ text: '质保期限合理，建议明确质保期内响应时限。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第六条 付款方式', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方应在收到乙方发票后支付相应款项。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '付款期限约定不够明确，建议细化分阶段付款计划。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第七条 违约责任', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '甲方违约责任上限为合同总价的5%，乙方违约责任上限为15%。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️ 高风险】', color: 'ff4d4f', bold: true }), new TextRun({ text: '双方违约金差距达3倍，存在显失公平风险，建议统一调整为10%。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第八条 保密条款', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '双方应对本合同内容及履行过程中获知的对方商业秘密承担保密义务。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️】', color: 'faad14', bold: true }), new TextRun({ text: '建议增加保密期限条款，如"合同期间及终止后3年内"。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第九条 争议解决', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '因本合同引起的争议，双方应协商解决；协商不成的，提交有管辖权的法院诉讼解决。' }),
+              new Paragraph({ children: [new TextRun({ text: '【批注⚠️ 高风险】', color: 'ff4d4f', bold: true }), new TextRun({ text: '管辖约定不明确，建议指定具体法院。', color: '666666' })] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '第十条 其他', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '本合同一式两份，双方各执一份，具有同等法律效力。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '甲方（盖章）：', bold: true }), new TextRun('XX科技有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '乙方（盖章）：', bold: true }), new TextRun('YY设备制造有限公司')] }),
+              new Paragraph({ children: [new TextRun({ text: '签署日期：', bold: true }), new TextRun('2026-05-01')] }),
+            ]
+          }]
+        });
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${contractName}_批注版.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }).catch(err => {
+          console.error('导出失败:', err);
+          alert('导出失败: ' + err.message);
+        });
+      } else if (format === 'report') {
+        // 审查意见书
+        const doc = new Document({
+          sections: [{
+            properties: {},
+            children: [
+              new Paragraph({ text: '合同审查意见书', heading: HeadingLevel.TITLE, alignment: AlignmentType.CENTER }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '报告编号：', bold: true }), new TextRun(`RPT-${contractId}-${new Date().toISOString().slice(0,10).replace(/-/g,'')}`)] }),
+              new Paragraph({ children: [new TextRun({ text: '生成时间：', bold: true }), new TextRun(new Date().toLocaleString('zh-CN'))] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '一、合同基本信息', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ children: [new TextRun({ text: '合同编号：', bold: true }), new TextRun(contractId)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同名称：', bold: true }), new TextRun(contractName)] }),
+              new Paragraph({ children: [new TextRun({ text: '合同类型：', bold: true }), new TextRun('采购合同')] }),
+              new Paragraph({ children: [new TextRun({ text: '合同金额：', bold: true }), new TextRun('¥5,000,000')] }),
+              new Paragraph({ children: [new TextRun({ text: '审查立场：', bold: true }), new TextRun('甲方')] }),
+              new Paragraph({ children: [new TextRun({ text: '风险等级：', bold: true }), new TextRun('一般风险')] }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '二、审查结论', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '经审查，本合同存在以下问题：' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '【高风险问题】', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 违约责任不对等', bold: true }),
+              new Paragraph({ text: '   位置：第7条' }),
+              new Paragraph({ text: '   问题：甲方违约责任上限5%，乙方高达15%，差距达3倍' }),
+              new Paragraph({ text: '   建议：统一调整违约金比例至10%，或缩小差距' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '2. 争议解决条款不明确', bold: true }),
+              new Paragraph({ text: '   位置：第9条' }),
+              new Paragraph({ text: '   问题："有管辖权的法院"表述过于模糊' }),
+              new Paragraph({ text: '   建议：明确指定具体管辖法院' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '【一般风险问题】', heading: HeadingLevel.HEADING_2 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 付款节点模糊', bold: true }),
+              new Paragraph({ text: '   位置：第6条' }),
+              new Paragraph({ text: '   问题：未明确具体付款期限' }),
+              new Paragraph({ text: '   建议：明确付款期限（如30个工作日内）及分阶段付款计划' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '2. 保密义务期限缺失', bold: true }),
+              new Paragraph({ text: '   位置：第8条' }),
+              new Paragraph({ text: '   问题：未明确保密期限' }),
+              new Paragraph({ text: '   建议：增加保密期限条款（如合同终止后3年）' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '三、完善建议', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 建议对违约责任条款进行修订，确保双方权利义务对等' }),
+              new Paragraph({ text: '2. 建议明确争议解决方式及管辖机构' }),
+              new Paragraph({ text: '3. 建议细化付款条款，明确各阶段付款时间节点' }),
+              new Paragraph({ text: '4. 建议增加保密期限条款' }),
+              new Paragraph({ text: '5. 建议在验收标准中增加量化指标' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '四、法律依据', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '1. 《中华人民共和国民法典》第585条' }),
+              new Paragraph({ text: '   约定的违约金过分高于造成的损失的，人民法院或者仲裁机构可以根据当事人的请求予以适当减少。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '2. 《中华人民共和国民法典》第497条' }),
+              new Paragraph({ text: '   提供格式条款一方不合理地免除或者减轻其责任、加重对方责任、限制对方主要权利的，该格式条款无效。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '3. 《中华人民共和国民事诉讼法》第35条' }),
+              new Paragraph({ text: '   合同纠纷的当事人可以书面协议选择管辖法院。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '五、声明', heading: HeadingLevel.HEADING_1 }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '本审查意见书仅供参考，不构成法律意见。如有疑问，请咨询专业律师。' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '' }),
+              new Paragraph({ text: '智能合同审查系统 生成', alignment: AlignmentType.CENTER, color: '999999' }),
+            ]
+          }]
+        });
+        Packer.toBlob(doc).then(blob => {
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${contractName}_审查意见书.docx`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }).catch(err => {
+          console.error('导出失败:', err);
+          alert('导出失败: ' + err.message);
+        });
+      }
+
+      closeExportModal();
+    }
 
     function scrollToClause(id) {
       var el = document.getElementById(id);
